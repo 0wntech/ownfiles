@@ -1,0 +1,32 @@
+{
+  "name": "ownfiles",
+  "version": "1.0.0",
+  "description": "A library to manage files in a Solid User's Pod",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0wntech/ownfiles.git"
+  },
+  "keywords": [
+    "Solid",
+    "Linked",
+    "Data",
+    "Javascript"
+  ],
+  "author": "Ludwig Schubert",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/0wntech/ownfiles/issues"
+  },
+  "homepage": "https://github.com/0wntech/ownfiles#readme",
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^6.2.0",
+    "solid-auth-cli": "^1.0.8"
+  }
+}
