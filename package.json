@@ -1,6 +1,6 @@
 {
   "name": "ownfiles",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A library to manage files in a Solid User's Pod",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "solid-auth-cli": "^1.0.8"
   },
   "dependencies": {
+    "mime": "^2.4.4",
     "ownuser": "^1.2.1",
     "rdflib": "^1.0.4",
     "request": "^2.88.0",
