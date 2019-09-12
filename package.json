@@ -4,7 +4,7 @@
   "description": "A library to manage files in a Solid User's Pod",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -28,5 +28,9 @@
     "chai-as-promised": "^7.1.1",
     "mocha": "^6.2.0",
     "solid-auth-cli": "^1.0.8"
+  },
+  "dependencies": {
+    "ownuser": "^1.2.0",
+    "url": "^0.11.0"
   }
 }
