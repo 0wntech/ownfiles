@@ -1,6 +1,6 @@
 const expect = require("chai").expect;
 const User = require("ownuser");
-const FileClient = require("../lib/index.js");
+const FileClient = require("../index.js");
 const config = require("./clientConfig.json");
 
 describe("FileClient", function() {

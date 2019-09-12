@@ -1,3 +1,5 @@
 {
-    "podUrl": "https://lalasepp1.solid.community"
+  "podUrl": "https://lalasepp1.solid.community",
+  "testFile": "https://lalasepp1.solid.community/test.txt",
+  "testFolder": "https://lalasepp1.solid.community/test/"
 }

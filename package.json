@@ -30,7 +30,9 @@
     "solid-auth-cli": "^1.0.8"
   },
   "dependencies": {
-    "ownuser": "^1.2.0",
+    "ownuser": "^1.2.1",
+    "rdflib": "^1.0.4",
+    "request": "^2.88.0",
     "url": "^0.11.0"
   }
 }
