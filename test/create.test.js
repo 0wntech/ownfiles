@@ -2,59 +2,81 @@ const expect = require("chai").expect;
 const auth = require("solid-auth-cli");
 const rdf = require("rdflib");
 const ns = require("solid-namespace")(rdf);
-const FileClient = require("../lib/index.js");
-const config = require("./clientConfig.json");
+const PodClient = require("../lib/index.js");
+const config = require("./podConfig.json");
 
-const fileClient = new FileClient({ podUrl: config.podUrl });
+const podClient = new PodClient({ podUrl: config.podUrl });
 
 describe("Create", function() {
   before("Setting up auth...", async function() {
     this.timeout(5000);
     const credentials = await auth.getCredentials();
     await auth.login(credentials);
-    fileClient.fetcher = new rdf.Fetcher(fileClient.graph, {
+    podClient.fetcher = new rdf.Fetcher(podClient.graph, {
       fetch: auth.fetch
     });
   });
 
-  describe("create()", function() {
+  after("Clean up...", async function() {
+    const folder = await podClient.read(config.podUrl);
+    cleanUps = [];
+    folder.folders.forEach(element => {
+      if (!config.podContents.folders.includes(element)) {
+        cleanUps.push(podClient.delete(element));
+      }
+    });
+    folder.files.forEach(element => {
+      if (!config.podContents.files.includes(element)) {
+        cleanUps.push(podClient.delete(element));
+      }
+    });
+    await Promise.all(cleanUps);
+  });
+
+  describe("create()", async function() {
     it("should create a folder at the specified url", async function() {
-      fileClient.create(config.testFolder).then(res => {
-        expect(res.status).to.equal(201);
-      });
+      const res = await podClient.create(config.testFolder);
+      expect(res.status).to.equal(201);
     });
 
     it("should not create a folder if there is no specified url and throw an error instead", function() {
-      expect(() => fileClient.create()).to.throw(Error);
+      expect(() => podClient.create()).to.throw(Error);
     });
 
     it("should not create a folder if there is an invalid url and throw an error instead", function() {
       expect(() =>
-        fileClient.create(config.testFolder.replace("https://", "lala://"))
+        podClient.create(config.testFolder.replace("https://", "lala://"))
       ).to.throw(Error);
     });
 
     it("should create a turtle file at the specified url with the turtle contents", async function() {
       const contents = [
         rdf.st(
-          "https://lalasepp1.solid.community/profile/card#me",
+          rdf.sym("https://lalasepp1.solid.community/profile/card#me"),
           ns.foaf("knows"),
-          "https://ludwig.owntech.de/profile/card#me"
+          rdf.sym("https://ludwig.owntech.de/profile/card#me"),
+          rdf.sym(config.testFile)
         )
       ];
-      fileClient.create(config.testFile, { contents: contents }).then(res => {
-        expect(res.status).to.equal(201);
+      const res = await podClient.create(config.testFile, {
+        contents: contents
       });
+      await podClient.fetcher.load(config.testFile);
+      const testTriples = podClient.graph.statementsMatching(
+        rdf.sym("https://lalasepp1.solid.community/profile/card#me")
+      );
+      expect(testTriples).to.deep.equal(contents);
     });
 
     it("should create a plaintext file at the specified url with the contents", async function() {
-      fileClient
-        .create(config.testFile, {
-          contentType: "text/plain",
-          contents: "Hello I am a text file."
-        })
+      const res = await podClient.create(config.testFile, {
+        contentType: "text/plain",
+        contents: "Hello I am a text file."
+      });
+      await podClient.fetcher
+        .load(config.testFile.replace("ttl", "txt"))
         .then(res => {
-          expect(res.status).to.equal(201);
+          expect(res.responseText).to.equal("Hello I am a text file.");
         });
     });
   });
