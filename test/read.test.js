@@ -8,28 +8,32 @@ const podClient = new PodClient({ podUrl: config.podUrl });
 
 describe("Read", function() {
   before("Setting up auth...", async function() {
-    this.timeout(5000);
-    const credentials = await auth.getCredentials();
-    await auth.login(credentials);
-    podClient.fetcher = new rdf.Fetcher(podClient.graph, {
-      fetch: auth.fetch
+    this.timeout(config.timeOut);
+    return new Promise(async (resolve, reject) => {
+      const credentials = await auth.getCredentials();
+      await auth.login(credentials);
+      podClient.fetcher = new rdf.Fetcher(podClient.graph, {
+        fetch: auth.fetch
+      });
+      const folder = await podClient.read(config.podUrl);
+      console.log(folder);
+      cleanUps = [];
+      folder.folders.forEach(element => {
+        if (!config.podContents.folders.includes(element)) {
+          cleanUps.push(podClient.delete(element));
+        }
+      });
+      folder.files.forEach(element => {
+        if (!config.podContents.files.includes(element)) {
+          cleanUps.push(podClient.delete(element));
+        }
+      });
+      await Promise.all(cleanUps).then(() => {
+        resolve();
+      }).catch((err) => {
+        reject(err);
+      });
     });
-  });
-
-  after("Clean up...", async function() {
-    const folder = await podClient.read(config.podUrl);
-    cleanUps = [];
-    folder.folders.forEach(element => {
-      if (!config.podContents.folders.includes(element)) {
-        cleanUps.push(podClient.delete(element));
-      }
-    });
-    folder.files.forEach(element => {
-      if (!config.podContents.files.includes(element)) {
-        cleanUps.push(podClient.delete(element));
-      }
-    });
-    await Promise.all(cleanUps);
   });
 
   describe("read()", function() {

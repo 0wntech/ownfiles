@@ -10,27 +10,31 @@ const podClient = new PodClient({ podUrl: config.podUrl });
 describe("Create", function() {
   before("Setting up auth...", async function() {
     this.timeout(5000);
-    const credentials = await auth.getCredentials();
-    await auth.login(credentials);
-    podClient.fetcher = new rdf.Fetcher(podClient.graph, {
-      fetch: auth.fetch
+    return new Promise(async (resolve, reject) => {
+      const credentials = await auth.getCredentials();
+      await auth.login(credentials);
+      podClient.fetcher = new rdf.Fetcher(podClient.graph, {
+        fetch: auth.fetch
+      });
+      const folder = await podClient.read(config.podUrl);
+      console.log(folder);
+      cleanUps = [];
+      folder.folders.forEach(element => {
+        if (!config.podContents.folders.includes(element)) {
+          cleanUps.push(podClient.delete(element));
+        }
+      });
+      folder.files.forEach(element => {
+        if (!config.podContents.files.includes(element)) {
+          cleanUps.push(podClient.delete(element));
+        }
+      });
+      await Promise.all(cleanUps).then(() => {
+        resolve();
+      }).catch((err) => {
+        reject(err);
+      });
     });
-  });
-
-  after("Clean up...", async function() {
-    const folder = await podClient.read(config.podUrl);
-    cleanUps = [];
-    folder.folders.forEach(element => {
-      if (!config.podContents.folders.includes(element)) {
-        cleanUps.push(podClient.delete(element));
-      }
-    });
-    folder.files.forEach(element => {
-      if (!config.podContents.files.includes(element)) {
-        cleanUps.push(podClient.delete(element));
-      }
-    });
-    await Promise.all(cleanUps);
   });
 
   describe("create()", async function() {
@@ -58,14 +62,18 @@ describe("Create", function() {
           rdf.sym(config.testFile)
         )
       ];
-      const res = await podClient.create(config.testFile, {
-        contents: contents
-      });
-      await podClient.fetcher.load(config.testFile);
-      const testTriples = podClient.graph.statementsMatching(
-        rdf.sym("https://lalasepp1.solid.community/profile/card#me")
-      );
-      expect(testTriples).to.deep.equal(contents);
+      await podClient
+        .create(config.testFile, {
+          contents: contents
+        })
+        .then(() => {
+          return podClient.fetcher.load(config.testFile).then(() => {
+            const testTriples = podClient.graph.statementsMatching(
+              rdf.sym("https://lalasepp1.solid.community/profile/card#me")
+            );
+            expect(testTriples).to.deep.equal(contents);
+          });
+        });
     });
 
     it("should create a plaintext file at the specified url with the contents", async function() {
