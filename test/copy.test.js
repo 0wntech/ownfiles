@@ -8,14 +8,17 @@ const config = require("./podConfig.json");
 const podClient = new PodClient({ podUrl: config.podUrl });
 
 describe("Copy", function() {
-  beforeEach("Setting up auth...", async function() {
+  before("Setting up auth...", async function() {
     this.timeout(config.timeOut);
+    const credentials = await auth.getCredentials();
+    await auth.login(credentials);
+    podClient.fetcher = new rdf.Fetcher(podClient.graph, {
+      fetch: auth.fetch
+    });
+  });
+
+  afterEach("Cleaning up", async function() {
     return new Promise(async (resolve, reject) => {
-      const credentials = await auth.getCredentials();
-      await auth.login(credentials);
-      podClient.fetcher = new rdf.Fetcher(podClient.graph, {
-        fetch: auth.fetch
-      });
       const folder = await podClient.read(config.podUrl);
       console.log(folder);
       cleanUps = [];
@@ -29,11 +32,13 @@ describe("Copy", function() {
           cleanUps.push(podClient.delete(element));
         }
       });
-      await Promise.all(cleanUps).then(() => {
-        resolve();
-      }).catch((err) => {
-        reject(err);
-      });
+      await Promise.all(cleanUps)
+        .then(() => {
+          resolve();
+        })
+        .catch(err => {
+          reject(err);
+        });
     });
   });
 
