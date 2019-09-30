@@ -17,7 +17,7 @@ describe("Rename", function() {
     });
   });
 
-  afterEach("Cleaning up", async function() {
+  after("Cleaning up", async function() {
     return new Promise(async (resolve, reject) => {
       const folder = await podClient.read(config.podUrl);
       console.log(folder);
@@ -43,7 +43,7 @@ describe("Rename", function() {
   });
 
   describe("rename()", function() {
-    xit("should rename the specified file", async function() {
+    it("should rename the specified file", async function() {
       const content = "Hello I am a text file.";
       await podClient.create(config.testFile, {
         contentType: "text/plain",
@@ -58,7 +58,7 @@ describe("Rename", function() {
       expect(file).to.equal(content);
     });
 
-    it("should rename the specified folder to the location", async function() {
+    it("should rename the specified folder", async function() {
       this.timeout(5000);
       const folderLocation = config.testFolder;
       const nestedFile = url.resolve(config.testFolder, "testFile");
