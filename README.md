@@ -126,12 +126,12 @@ fileClient.renameFolder(file, newName).then(() => {
 
 ## Contributing
 
-In general contributions are very welcome, feel free to work and open pull requests in regards to issues/optimizations you see. 
-Please write a test or use an existing test in your development process, so that we can make sure your contributiion integrates smoothly.
+In general contributions are very welcome, feel free to work on and open pull requests in regards to issues/optimizations you see. 
+Please write a test or use an existing test in your development process, so that we can make sure your contribution integrates smoothly.
 
 ### Testing
 
-To test the library we decided on using mocha and chai.
+To test this library we decided on using mocha and chai.
 To run the tests simply run `npm run test`
 
 Since the operations are all asynchronous it can come to complications between the tests (we're working on that), so to test singularly run:
