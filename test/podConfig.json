@@ -15,5 +15,6 @@
       "https://lalasepp1.solid.community/favicon.ico",
       "https://lalasepp1.solid.community/robots.txt"
     ]
-  }
+  },
+  "timeOut": 8000
 }

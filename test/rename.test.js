@@ -7,7 +7,7 @@ const config = require("./podConfig.json");
 
 const podClient = new PodClient({ podUrl: config.podUrl });
 
-describe("Copy", function() {
+describe("Rename", function() {
   before("Setting up auth...", async function() {
     this.timeout(config.timeOut);
     const credentials = await auth.getCredentials();
@@ -17,7 +17,7 @@ describe("Copy", function() {
     });
   });
 
-  afterEach("Cleaning up", async function() {
+  after("Cleaning up", async function() {
     return new Promise(async (resolve, reject) => {
       const folder = await podClient.read(config.podUrl);
       console.log(folder);
@@ -42,20 +42,23 @@ describe("Copy", function() {
     });
   });
 
-  describe("copy()", function() {
-    it("should copy the specified file to the location", async function() {
+  describe("rename()", function() {
+    it("should rename the specified file", async function() {
       const content = "Hello I am a text file.";
       await podClient.create(config.testFile, {
         contentType: "text/plain",
         contents: content
       });
-      const copyLocation = url.resolve(config.podUrl, "profile") + "/";
-      await podClient.copy(config.testFile.replace("ttl", "txt"), copyLocation);
-      const file = await podClient.read(url.resolve(copyLocation, "test.txt"));
+      const newName = "test2";
+      const filePath = config.testFile.replace("ttl", "txt");
+      await podClient.renameFile(filePath, newName);
+      const file = await podClient.read(
+        filePath.replace("test.txt", "test2.txt")
+      );
       expect(file).to.equal(content);
     });
 
-    it("should copy the specified folder to the location", async function() {
+    it("should rename the specified folder", async function() {
       this.timeout(5000);
       const folderLocation = config.testFolder;
       const nestedFile = url.resolve(config.testFolder, "testFile");
@@ -75,18 +78,20 @@ describe("Copy", function() {
         contents: content
       });
 
-      const copyLocation = url.resolve(config.podUrl, "/public");
-      await podClient.copy(folderLocation, copyLocation);
+      const newName = "test2";
+      await podClient.renameFolder(folderLocation, newName);
 
-      const copiedFolder = url.resolve(copyLocation, "test");
+      const renamedFolder = folderLocation.replace("test", "test2");
+      console.log(renamedFolder);
       const file = await podClient.read(
-        url.resolve(copiedFolder + "/", "testFile.txt")
+        url.resolve(renamedFolder, "testFile.txt")
       );
       expect(file).to.equal(content);
 
-      const copiedNestedFolder = url.resolve(copiedFolder + "/", "test");
+      const renamedNestedFolder = url.resolve(renamedFolder, "test");
+      console.log(renamedNestedFolder);
       const file2 = await podClient.read(
-        url.resolve(copiedNestedFolder + "/", "testFile.txt")
+        url.resolve(renamedNestedFolder + "/", "testFile.txt")
       );
       expect(file2).to.equal(content);
     });
