@@ -20,7 +20,6 @@ describe("Rename", function() {
   after("Cleaning up", async function() {
     return new Promise(async (resolve, reject) => {
       const folder = await podClient.read(config.podUrl);
-      console.log(folder);
       cleanUps = [];
       folder.folders.forEach(element => {
         if (!config.podContents.folders.includes(element)) {

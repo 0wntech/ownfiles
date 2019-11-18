@@ -17,31 +17,6 @@ describe("Copy", function() {
     });
   });
 
-  afterEach("Cleaning up", async function() {
-    return new Promise(async (resolve, reject) => {
-      const folder = await podClient.read(config.podUrl);
-      console.log(folder);
-      cleanUps = [];
-      folder.folders.forEach(element => {
-        if (!config.podContents.folders.includes(element)) {
-          cleanUps.push(podClient.delete(element));
-        }
-      });
-      folder.files.forEach(element => {
-        if (!config.podContents.files.includes(element)) {
-          cleanUps.push(podClient.delete(element));
-        }
-      });
-      await Promise.all(cleanUps)
-        .then(() => {
-          resolve();
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  });
-
   describe("copy()", function() {
     it("should copy the specified file to the location", async function() {
       const content = "Hello I am a text file.";
@@ -89,6 +64,30 @@ describe("Copy", function() {
         url.resolve(copiedNestedFolder + "/", "testFile.txt")
       );
       expect(file2).to.equal(content);
+    });
+  });
+
+  afterEach("Cleaning up", async function() {
+    return new Promise(async (resolve, reject) => {
+      const folder = await podClient.read(config.podUrl);
+      cleanUps = [];
+      folder.folders.forEach(element => {
+        if (!config.podContents.folders.includes(element)) {
+          cleanUps.push(podClient.delete(element));
+        }
+      });
+      folder.files.forEach(element => {
+        if (!config.podContents.files.includes(element)) {
+          cleanUps.push(podClient.delete(element));
+        }
+      });
+      await Promise.all(cleanUps)
+        .then(() => {
+          resolve();
+        })
+        .catch(err => {
+          reject(err);
+        });
     });
   });
 });

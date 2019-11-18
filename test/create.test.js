@@ -17,7 +17,6 @@ describe("Create", function() {
         fetch: auth.fetch
       });
       const folder = await podClient.read(config.podUrl);
-      console.log(folder);
       cleanUps = [];
       folder.folders.forEach(element => {
         if (!config.podContents.folders.includes(element)) {
