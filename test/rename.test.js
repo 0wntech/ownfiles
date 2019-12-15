@@ -7,9 +7,10 @@ const config = require("./podConfig.json");
 
 const podClient = new PodClient({ podUrl: config.podUrl });
 
+
 describe("Rename", function() {
+  this.timeout(config.timeOut);
   before("Setting up auth...", async function() {
-    this.timeout(config.timeOut);
     const credentials = await auth.getCredentials();
     await auth.login(credentials);
     podClient.fetcher = new rdf.Fetcher(podClient.graph, {
@@ -58,7 +59,6 @@ describe("Rename", function() {
     });
 
     it("should rename the specified folder", async function() {
-      this.timeout(5000);
       const folderLocation = config.testFolder;
       const nestedFile = url.resolve(config.testFolder, "testFile");
       const nestedFolder = url.resolve(folderLocation, "test") + "/";
