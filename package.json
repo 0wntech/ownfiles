@@ -1,69 +1,64 @@
 {
-  "name": "ownfiles",
-  "version": "1.1.7",
-  "description": "A library to manage files in a Solid User's Pod",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha",
-    "lint": "eslint lib test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/0wntech/ownfiles.git"
-  },
-  "keywords": [
-    "Solid",
-    "Linked",
-    "Data",
-    "Javascript"
-  ],
-  "author": "Ludwig Schubert",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/0wntech/ownfiles/issues"
-  },
-  "homepage": "https://github.com/0wntech/ownfiles#readme",
-  "devDependencies": {
-    "assert": "^2.0.0",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "eslint": "^6.7.2",
-    "eslint-config-google": "^0.13.0",
-    "eslint-config-prettier": "^4.3.0",
-    "eslint-plugin-import": "^2.19.1",
-    "husky": "^3.1.0",
-    "lint-staged": "^9.5.0",
-    "mocha": "^6.2.0",
-    "prettier": "^1.19.1",
-    "solid-auth-cli": "^1.0.8"
-  },
-  "lint-staged": {
-    "linters": {
-      "*.js": [
-        "prettier --write",
-        "eslint --fix",
-        "git add"
-      ],
-      "*.{json}": [
-        "prettier --write",
-        "git add"
-      ]
+    "name": "ownfiles",
+    "version": "1.1.7",
+    "description": "A library to manage files in a Solid User's Pod",
+    "main": "index.js",
+    "scripts": {
+        "test": "mocha",
+        "lint": "eslint lib test"
     },
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "mocha"
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/0wntech/ownfiles.git"
+    },
+    "keywords": [
+        "Solid",
+        "Linked",
+        "Data",
+        "Javascript"
+    ],
+    "author": "Ludwig Schubert",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/0wntech/ownfiles/issues"
+    },
+    "homepage": "https://github.com/0wntech/ownfiles#readme",
+    "devDependencies": {
+        "assert": "^2.0.0",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "eslint": "^6.7.2",
+        "eslint-config-google": "^0.13.0",
+        "eslint-config-prettier": "^4.3.0",
+        "eslint-plugin-import": "^2.19.1",
+        "husky": "^3.1.0",
+        "lint-staged": "^9.5.0",
+        "mocha": "^6.2.0",
+        "prettier": "^1.19.1",
+        "solid-auth-cli": "^1.0.8"
+    },
+    "lint-staged": {
+        "*.js": [
+            "prettier --write",
+            "eslint --fix",
+            "git add"
+        ],
+        "*.{json}": [
+            "prettier --write",
+            "git add"
+        ]
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged && mocha",
+            "pre-push": "lint-staged && mocha"
+        }
+    },
+    "dependencies": {
+        "mime": "^2.4.4",
+        "ownuser": "^1.2.1",
+        "rdflib": "^1.0.4",
+        "request": "^2.88.0",
+        "url": "^0.11.0"
     }
-  },
-  "dependencies": {
-    "mime": "^2.4.4",
-    "ownuser": "^1.2.1",
-    "rdflib": "^1.0.4",
-    "request": "^2.88.0",
-    "url": "^0.11.0"
-  }
 }
