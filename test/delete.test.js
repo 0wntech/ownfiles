@@ -7,8 +7,8 @@ const config = require("./podConfig.json");
 const podClient = new PodClient({ podUrl: config.podUrl });
 
 describe("Delete", function() {
+  this.timeout(config.timeOut);
   before("Setting up auth...", async function() {
-    this.timeout(config.timeOut);
     return new Promise(async (resolve, reject) => {
       const credentials = await auth.getCredentials();
       await auth.login(credentials);
