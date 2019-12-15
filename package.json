@@ -4,7 +4,8 @@
   "description": "A library to manage files in a Solid User's Pod",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "eslint lib test"
   },
   "repository": {
     "type": "git",
@@ -26,11 +27,34 @@
     "assert": "^2.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "eslint": "^6.7.2",
+    "eslint-config-google": "^0.13.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-import": "^2.19.1",
     "husky": "^3.1.0",
+    "lint-staged": "^9.5.0",
     "mocha": "^6.2.0",
+    "prettier": "^1.19.1",
     "solid-auth-cli": "^1.0.8"
   },
-  "husky":{
+  "lint-staged": {
+    "linters": {
+      "*.js": [
+        "prettier --write",
+        "eslint --fix",
+        "git add"
+      ],
+      "*.{json}": [
+        "prettier --write",
+        "git add"
+      ]
+    },
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "husky": {
     "hooks": {
       "pre-commit": "mocha"
     }
