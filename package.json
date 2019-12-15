@@ -26,8 +26,14 @@
     "assert": "^2.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "husky": "^3.1.0",
     "mocha": "^6.2.0",
     "solid-auth-cli": "^1.0.8"
+  },
+  "husky":{
+    "hooks": {
+      "pre-commit": "mocha"
+    }
   },
   "dependencies": {
     "mime": "^2.4.4",

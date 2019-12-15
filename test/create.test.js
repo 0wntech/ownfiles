@@ -8,7 +8,7 @@ const config = require("./podConfig.json");
 const podClient = new PodClient({ podUrl: config.podUrl });
 
 describe("Create", function() {
-  this.timeout(config.timeout);
+  this.timeout(config.timeOut);
   before("Setting up auth...", async function() {
     return new Promise(async (resolve, reject) => {
       const credentials = await auth.getCredentials();
