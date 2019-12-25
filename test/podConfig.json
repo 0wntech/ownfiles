@@ -16,5 +16,7 @@
       "https://lalasepp1.solid.community/robots.txt"
     ]
   },
+  "updateTestFile": "https://lalasepp1.solid.community/robots.txt",
+  "updateTestContent": "User-agent: *\n# Allow all crawling (subject to ACLs as usual, of course)\nDisallow:",
   "timeOut": 8000
 }
