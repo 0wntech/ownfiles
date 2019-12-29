@@ -1,22 +1,22 @@
 {
-  "podUrl": "https://lalasepp1.solid.community",
-  "testFile": "https://lalasepp1.solid.community/test.ttl",
-  "testFolder": "https://lalasepp1.solid.community/test/",
-  "podContents": {
-    "folders": [
-      "https://lalasepp1.solid.community/.well-known/",
-      "https://lalasepp1.solid.community/inbox/",
-      "https://lalasepp1.solid.community/private/",
-      "https://lalasepp1.solid.community/profile/",
-      "https://lalasepp1.solid.community/public/",
-      "https://lalasepp1.solid.community/settings/"
-    ],
-    "files": [
-      "https://lalasepp1.solid.community/favicon.ico",
-      "https://lalasepp1.solid.community/robots.txt"
-    ]
-  },
-  "updateTestFile": "https://lalasepp1.solid.community/robots.txt",
-  "updateTestContent": "User-agent: *\n# Allow all crawling (subject to ACLs as usual, of course)\nDisallow:",
-  "timeOut": 8000
+    "podUrl": "https://lalasepp1.solid.community",
+    "testFile": "https://lalasepp1.solid.community/test.ttl",
+    "testFolder": "https://lalasepp1.solid.community/test/",
+    "podContents": {
+        "folders": [
+            "https://lalasepp1.solid.community/.well-known/",
+            "https://lalasepp1.solid.community/inbox/",
+            "https://lalasepp1.solid.community/private/",
+            "https://lalasepp1.solid.community/profile/",
+            "https://lalasepp1.solid.community/public/",
+            "https://lalasepp1.solid.community/settings/"
+        ],
+        "files": [
+            "https://lalasepp1.solid.community/favicon.ico",
+            "https://lalasepp1.solid.community/robots.txt"
+        ]
+    },
+    "updateTestFile": "https://lalasepp1.solid.community/robots.txt",
+    "updateTestContent": "User-agent: *\n# Allow all crawling (subject to ACLs as usual, of course)\nDisallow:",
+    "timeOut": 10000
 }
