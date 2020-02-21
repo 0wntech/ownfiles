@@ -43,6 +43,13 @@ describe('Read', function() {
             expect(folder).to.deep.equal(config.podContents);
         });
 
+        it('should read the specified folder and types', async function() {
+            const folder = await podClient.read(config.podUrl, {
+                verbose: true,
+            });
+            expect(folder).to.deep.equal(config.verboseFolder);
+        });
+
         it('should read the contents of the specified file', async function() {
             const content = 'Hello I am a text file.';
             await podClient.create(config.testFile, {
@@ -50,7 +57,7 @@ describe('Read', function() {
                 contents: content,
             });
             const file = await podClient.read(
-                config.testFile.replace('ttl', 'txt'),
+                config.testFile.replace('ttl', 'txt')
             );
             expect(file).to.equal(content);
         });

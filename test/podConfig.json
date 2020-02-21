@@ -16,6 +16,26 @@
             "https://lalasepp1.solid.community/robots.txt"
         ]
     },
+    "verboseFolder": {
+        "folders": [
+            "https://lalasepp1.solid.community/.well-known/",
+            "https://lalasepp1.solid.community/inbox/",
+            "https://lalasepp1.solid.community/private/",
+            "https://lalasepp1.solid.community/profile/",
+            "https://lalasepp1.solid.community/public/",
+            "https://lalasepp1.solid.community/settings/"
+        ],
+        "files": [
+            {
+                "name": "https://lalasepp1.solid.community/favicon.ico",
+                "type": "image/vnd.microsoft.icon"
+            },
+            {
+                "name": "https://lalasepp1.solid.community/robots.txt",
+                "type": "text/plain"
+            }
+        ]
+    },
     "updateTestFile": "https://lalasepp1.solid.community/robots.txt",
     "updateTestContent": "User-agent: *\n# Allow all crawling (subject to ACLs as usual, of course)\nDisallow:",
     "timeOut": 10000
