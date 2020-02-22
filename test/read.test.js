@@ -44,7 +44,7 @@ describe('Read', function() {
         });
 
         it('should read the specified folder and types', async function() {
-            const folder = await podClient.read(config.podUrl, {
+            const folder = await podClient.read(config.podUrl + 'profile/', {
                 verbose: true,
             });
             expect(folder).to.deep.equal(config.verboseFolder);

@@ -1,5 +1,5 @@
 {
-    "podUrl": "https://lalasepp1.solid.community",
+    "podUrl": "https://lalasepp1.solid.community/",
     "testFile": "https://lalasepp1.solid.community/test.ttl",
     "testFolder": "https://lalasepp1.solid.community/test/",
     "podContents": {
@@ -17,22 +17,11 @@
         ]
     },
     "verboseFolder": {
-        "folders": [
-            "https://lalasepp1.solid.community/.well-known/",
-            "https://lalasepp1.solid.community/inbox/",
-            "https://lalasepp1.solid.community/private/",
-            "https://lalasepp1.solid.community/profile/",
-            "https://lalasepp1.solid.community/public/",
-            "https://lalasepp1.solid.community/settings/"
-        ],
+        "folders": [],
         "files": [
             {
-                "name": "https://lalasepp1.solid.community/favicon.ico",
-                "type": "image/vnd.microsoft.icon"
-            },
-            {
-                "name": "https://lalasepp1.solid.community/robots.txt",
-                "type": "text/plain"
+                "name": "https://lalasepp1.solid.community/profile/card",
+                "type": "rdf"
             }
         ]
     },

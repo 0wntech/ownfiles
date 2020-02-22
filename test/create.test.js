@@ -51,8 +51,8 @@ describe('Create', function() {
         it('should not create a folder if there is an invalid url and throw an error instead', function() {
             expect(() =>
                 podClient.create(
-                    config.testFolder.replace('https://', 'lala://'),
-                ),
+                    config.testFolder.replace('https://', 'lala://')
+                )
             ).to.throw(Error);
         });
 
@@ -60,11 +60,11 @@ describe('Create', function() {
             const contents = [
                 rdf.st(
                     rdf.sym(
-                        'https://lalasepp1.solid.community/profile/card#me',
+                        'https://lalasepp1.solid.community/profile/card#me'
                     ),
                     ns.foaf('knows'),
                     rdf.sym('https://ludwig.owntech.de/profile/card#me'),
-                    rdf.sym(config.testFile),
+                    rdf.sym(config.testFile)
                 ),
             ];
             await podClient
@@ -72,14 +72,18 @@ describe('Create', function() {
                     contents: contents,
                 })
                 .then(() => {
-                    return podClient.fetcher.load(config.testFile).then(() => {
-                        const testTriples = podClient.graph.statementsMatching(
-                            rdf.sym(
-                                'https://lalasepp1.solid.community/profile/card#me',
-                            ),
-                        );
-                        expect(testTriples).to.deep.equal(contents);
-                    });
+                    const store = rdf.graph();
+                    const fetcher = new rdf.Fetcher(store);
+                    return fetcher
+                        .load(config.testFile)
+                        .then(() => {
+                            const testTriples = store.statementsMatching(
+                                rdf.sym(
+                                    'https://lalasepp1.solid.community/profile/card#me'
+                                )
+                            );
+                            expect(testTriples).to.deep.equal(contents);
+                        });
                 });
         });
 
@@ -92,9 +96,21 @@ describe('Create', function() {
                 .load(config.testFile.replace('ttl', 'txt'))
                 .then((res) => {
                     expect(res.responseText).to.equal(
-                        'Hello I am a text file.',
+                        'Hello I am a text file.'
                     );
                 });
         });
+    });
+
+    after('Cleaning up...', async () => {
+        const profileContents = await podClient.read(
+            config.podUrl + 'profile/'
+        );
+        await Promise.all(
+            profileContents.files.map((file) => {
+                if (file !== config.podUrl + 'profile/card')
+                    return podClient.delete(file);
+            })
+        );
     });
 });
