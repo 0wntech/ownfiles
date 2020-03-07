@@ -44,15 +44,15 @@ describe('Rename', function() {
     describe('rename()', function() {
         it('should rename the specified file', async function() {
             const content = 'Hello I am a text file.';
-            await podClient.create(config.testFile, {
+            const testFile = config.testFile.replace(".ttl", ".txt")
+            await podClient.create(testFile, {
                 contentType: 'text/plain',
                 contents: content,
             });
-            const newName = 'test2';
-            const filePath = config.testFile.replace('ttl', 'txt');
-            await podClient.renameFile(filePath, newName);
+            const newName = 'test2.txt';
+            await podClient.renameFile(testFile, newName);
             const file = await podClient.read(
-                filePath.replace('test.txt', 'test2.txt'),
+                testFile.replace('test.txt', 'test2.txt')
             );
             expect(file).to.equal(content);
         });
@@ -82,14 +82,14 @@ describe('Rename', function() {
             const renamedFolder = folderLocation.replace('test', 'test2');
             console.log(renamedFolder);
             const file = await podClient.read(
-                url.resolve(renamedFolder, 'testFile.txt'),
+                url.resolve(renamedFolder, 'testFile.txt')
             );
             expect(file).to.equal(content);
 
             const renamedNestedFolder = url.resolve(renamedFolder, 'test');
             console.log(renamedNestedFolder);
             const file2 = await podClient.read(
-                url.resolve(renamedNestedFolder + '/', 'testFile.txt'),
+                url.resolve(renamedNestedFolder + '/', 'testFile.txt')
             );
             expect(file2).to.equal(content);
         });
