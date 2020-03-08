@@ -7,6 +7,30 @@ const config = require('./podConfig.json');
 
 const podClient = new PodClient({ podUrl: config.podUrl });
 
+const cleanUp = async () => {
+    return new Promise(async (resolve, reject) => {
+        const folder = await podClient.read(config.podUrl);
+        cleanUps = [];
+        folder.folders.forEach((element) => {
+            if (!config.podContents.folders.includes(element)) {
+                cleanUps.push(podClient.delete(element));
+            }
+        });
+        folder.files.forEach((element) => {
+            if (!config.podContents.files.includes(element)) {
+                cleanUps.push(podClient.delete(element));
+            }
+        });
+        await Promise.all(cleanUps)
+            .then(() => {
+                resolve();
+            })
+            .catch((err) => {
+                reject(err);
+            });
+    });
+};
+
 describe('Rename', function() {
     this.timeout(config.timeOut);
     before('Setting up auth...', async function() {
@@ -17,33 +41,13 @@ describe('Rename', function() {
         });
     });
 
-    after('Cleaning up', async function() {
-        return new Promise(async (resolve, reject) => {
-            const folder = await podClient.read(config.podUrl);
-            cleanUps = [];
-            folder.folders.forEach((element) => {
-                if (!config.podContents.folders.includes(element)) {
-                    cleanUps.push(podClient.delete(element));
-                }
-            });
-            folder.files.forEach((element) => {
-                if (!config.podContents.files.includes(element)) {
-                    cleanUps.push(podClient.delete(element));
-                }
-            });
-            await Promise.all(cleanUps)
-                .then(() => {
-                    resolve();
-                })
-                .catch((err) => {
-                    reject(err);
-                });
-        });
-    });
+    before('Cleaning up', cleanUp);
+
+    after('Cleaning up', cleanUp);
 
     describe('rename()', function() {
         it('should rename the specified file', async function() {
-            const content = 'Hello I am a text file.';
+            const content = '{"test": 1}';
             const testFile = config.testFile.replace('.ttl', '.txt');
             await podClient.create(testFile, {
                 contentType: 'text/plain',
@@ -52,15 +56,16 @@ describe('Rename', function() {
             const newName = 'test2.txt';
             await podClient.renameFile(testFile, newName);
             const file = await podClient.read(
-                testFile.replace('test.txt', 'test2.txt')
+                testFile.replace('test.txt', 'test2.txt'),
             );
             expect(file).to.equal(content);
         });
 
         it('should change file type', async () => {
-            const content = 'Hello I am a text file.';
+            const content = '{"test": 1}';
             const newNameWithType = 'test2.js';
             const testFile = config.testFile.replace('test.ttl', 'test2.txt');
+            console.log(testFile);
             await podClient.renameFile(testFile, newNameWithType);
             const file = await podClient.read(testFile.replace('.txt', '.js'));
 
@@ -92,14 +97,14 @@ describe('Rename', function() {
             const renamedFolder = folderLocation.replace('test', 'test2');
             console.log(renamedFolder);
             const file = await podClient.read(
-                url.resolve(renamedFolder, 'testFile.txt')
+                url.resolve(renamedFolder, 'testFile.txt'),
             );
             expect(file).to.equal(content);
 
             const renamedNestedFolder = url.resolve(renamedFolder, 'test');
             console.log(renamedNestedFolder);
             const file2 = await podClient.read(
-                url.resolve(renamedNestedFolder + '/', 'testFile.txt')
+                url.resolve(renamedNestedFolder + '/', 'testFile.txt'),
             );
             expect(file2).to.equal(content);
         });
