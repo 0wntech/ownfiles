@@ -44,7 +44,7 @@ describe('Rename', function() {
     describe('rename()', function() {
         it('should rename the specified file', async function() {
             const content = 'Hello I am a text file.';
-            const testFile = config.testFile.replace(".ttl", ".txt")
+            const testFile = config.testFile.replace('.ttl', '.txt');
             await podClient.create(testFile, {
                 contentType: 'text/plain',
                 contents: content,
@@ -54,6 +54,16 @@ describe('Rename', function() {
             const file = await podClient.read(
                 testFile.replace('test.txt', 'test2.txt')
             );
+            expect(file).to.equal(content);
+        });
+
+        it('should change file type', async () => {
+            const content = 'Hello I am a text file.';
+            const newNameWithType = 'test2.js';
+            const testFile = config.testFile.replace('test.ttl', 'test2.txt');
+            await podClient.renameFile(testFile, newNameWithType);
+            const file = await podClient.read(testFile.replace('.txt', '.js'));
+
             expect(file).to.equal(content);
         });
 
