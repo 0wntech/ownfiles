@@ -4,8 +4,6 @@ const rdf = require('rdflib');
 const config = require('./podConfig.json');
 const FileClient = require('../lib/index.js');
 const podClient = new FileClient();
-const { createLocalStorage } = require('localStorage-ponyfill');
-const localStorage = createLocalStorage({ mode: 'memory' });
 
 describe('DeepRead', function() {
     this.timeout(config.timeOut);
@@ -22,7 +20,7 @@ describe('DeepRead', function() {
     });
 
     describe('deepRead()', function() {
-        it('should deep fetch and cache a hierarchy of files from a given url', async function() {
+        it('should deep fetch a hierarchy of files from a given url', async function() {
             await podClient.createFolder(config.podUrl, { name: 'test' });
             await podClient.createFolder(config.podUrl + 'test/', {
                 name: 'test',
@@ -40,8 +38,6 @@ describe('DeepRead', function() {
                 config.podUrl + 'test/test/',
                 config.podUrl + 'test/',
             ]);
-            const cached = localStorage.getItem(config.podUrl + 'test/');
-            expect(JSON.parse(cached)).to.deep.equal(deepFolder);
         });
     });
 });
