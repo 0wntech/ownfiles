@@ -2,10 +2,10 @@ const expect = require('chai').expect;
 const auth = require('solid-auth-cli');
 const rdf = require('rdflib');
 const ns = require('solid-namespace')(rdf);
-const PodClient = require('../lib/index.js');
+const FileClient = require('../lib/index.js');
 const config = require('./podConfig.json');
 
-const podClient = new PodClient({ podUrl: config.podUrl });
+const podClient = new FileClient({ podUrl: config.podUrl });
 
 describe('Create', function() {
     this.timeout(config.timeOut);
@@ -74,16 +74,14 @@ describe('Create', function() {
                 .then(() => {
                     const store = rdf.graph();
                     const fetcher = new rdf.Fetcher(store);
-                    return fetcher
-                        .load(config.testFile)
-                        .then(() => {
-                            const testTriples = store.statementsMatching(
-                                rdf.sym(
-                                    'https://lalasepp1.solid.community/profile/card#me'
-                                )
-                            );
-                            expect(testTriples).to.deep.equal(contents);
-                        });
+                    return fetcher.load(config.testFile).then(() => {
+                        const testTriples = store.statementsMatching(
+                            rdf.sym(
+                                'https://lalasepp1.solid.community/profile/card#me'
+                            )
+                        );
+                        expect(testTriples).to.deep.equal(contents);
+                    });
                 });
         });
 
@@ -108,8 +106,9 @@ describe('Create', function() {
         );
         await Promise.all(
             profileContents.files.map((file) => {
-                if (file !== config.podUrl + 'profile/card')
-                    return podClient.delete(file);
+                if (file !== config.podUrl + 'profile/card') {
+return podClient.delete(file);
+}
             })
         );
     });

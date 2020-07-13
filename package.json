@@ -1,6 +1,6 @@
 {
     "name": "ownfiles",
-    "version": "1.2.15",
+    "version": "1.2.16",
     "description": "A library to manage files in a Solid User's Pod",
     "main": "index.js",
     "scripts": {
@@ -55,6 +55,7 @@
         }
     },
     "dependencies": {
+        "localstorage-ponyfill": "^1.0.2",
         "mime": "^2.4.4",
         "ownuser": "^1.2.1",
         "rdflib": "^1.0.4",

@@ -14,6 +14,7 @@
         "ecmaVersion": 2018
     },
     "rules": {
+        "comma-dangle": 0,
         "max-len": [1, 100, 4],
         "linebreak-style": 0,
         "indent": 0,

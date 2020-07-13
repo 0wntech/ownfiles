@@ -2,10 +2,10 @@ const expect = require('chai').expect;
 const auth = require('solid-auth-cli');
 const rdf = require('rdflib');
 const url = require('url');
-const PodClient = require('../lib/index.js');
+const FileClient = require('../lib/index.js');
 const config = require('./podConfig.json');
 
-const podClient = new PodClient({ podUrl: config.podUrl });
+const podClient = new FileClient({ podUrl: config.podUrl });
 
 describe('Copy', function() {
     this.timeout(config.timeOut);
@@ -27,10 +27,10 @@ describe('Copy', function() {
             const copyLocation = url.resolve(config.podUrl, 'profile') + '/';
             await podClient.copy(
                 config.testFile.replace('ttl', 'txt'),
-                copyLocation,
+                copyLocation
             );
             const file = await podClient.read(
-                url.resolve(copyLocation, 'test.txt'),
+                url.resolve(copyLocation, 'test.txt')
             );
             expect(file).to.equal(content);
         });
@@ -54,18 +54,19 @@ describe('Copy', function() {
                 contents: content,
             });
 
-            const copyLocation = url.resolve(config.podUrl, '/public');
+            await podClient.createFolder(config.podUrl, { name: 'test2' });
+            const copyLocation = url.resolve(config.podUrl, '/test2');
             await podClient.copy(folderLocation, copyLocation);
 
             const copiedFolder = url.resolve(copyLocation, 'test');
             const file = await podClient.read(
-                url.resolve(copiedFolder + '/', 'testFile.txt'),
+                url.resolve(copiedFolder + '/', 'testFile.txt')
             );
             expect(file).to.equal(content);
 
             const copiedNestedFolder = url.resolve(copiedFolder + '/', 'test');
             const file2 = await podClient.read(
-                url.resolve(copiedNestedFolder + '/', 'testFile.txt'),
+                url.resolve(copiedNestedFolder + '/', 'testFile.txt')
             );
             expect(file2).to.equal(content);
         });

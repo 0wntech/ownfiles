@@ -1,9 +1,9 @@
 const expect = require('chai').expect;
 const auth = require('solid-auth-cli');
 const rdf = require('rdflib');
-const PodClient = require('../lib/index.js');
+const FileClient = require('../lib/index.js');
 const config = require('./podConfig.json');
-const podClient = new PodClient();
+const podClient = new FileClient();
 
 describe('Update', function() {
     this.timeout(config.timeOut);
@@ -18,7 +18,7 @@ describe('Update', function() {
     after('Cleaning up', async function() {
         return podClient.update(
             config.updateTestFile,
-            config.updateTestContent,
+            config.updateTestContent
         );
     });
 
