@@ -51,7 +51,7 @@
     "husky": {
         "hooks": {
             "pre-commit": "lint-staged && mocha",
-            "pre-push": "lint-staged && mocha && npm publish"
+            "pre-push": "lint-staged && mocha && npm version patch && npm publish"
         }
     },
     "dependencies": {
