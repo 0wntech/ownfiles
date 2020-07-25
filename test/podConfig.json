@@ -8,7 +8,6 @@
             "https://lalasepp1.solid.community/inbox/",
             "https://lalasepp1.solid.community/private/",
             "https://lalasepp1.solid.community/profile/",
-            "https://lalasepp1.solid.community/public/",
             "https://lalasepp1.solid.community/settings/"
         ],
         "files": [
@@ -27,5 +26,5 @@
     },
     "updateTestFile": "https://lalasepp1.solid.community/robots.txt",
     "updateTestContent": "User-agent: *\n# Allow all crawling (subject to ACLs as usual, of course)\nDisallow:",
-    "timeOut": 10000
+    "timeOut": 20000
 }

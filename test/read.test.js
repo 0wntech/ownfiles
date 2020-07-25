@@ -1,10 +1,10 @@
 const expect = require('chai').expect;
 const auth = require('solid-auth-cli');
 const rdf = require('rdflib');
-const PodClient = require('../lib/index.js');
+const FileClient = require('../lib/index.js');
 const config = require('./podConfig.json');
 
-const podClient = new PodClient({ podUrl: config.podUrl });
+const podClient = new FileClient({ podUrl: config.podUrl });
 
 describe('Read', function() {
     this.timeout(config.timeOut);

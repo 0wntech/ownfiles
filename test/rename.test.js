@@ -2,10 +2,10 @@ const expect = require('chai').expect;
 const auth = require('solid-auth-cli');
 const rdf = require('rdflib');
 const url = require('url');
-const PodClient = require('../lib/index.js');
+const FileClient = require('../lib/index.js');
 const config = require('./podConfig.json');
 
-const podClient = new PodClient({ podUrl: config.podUrl });
+const podClient = new FileClient({ podUrl: config.podUrl });
 
 const cleanUp = async () => {
     return new Promise(async (resolve, reject) => {
@@ -56,7 +56,7 @@ describe('Rename', function() {
             const newName = 'test2.txt';
             await podClient.renameFile(testFile, newName);
             const file = await podClient.read(
-                testFile.replace('test.txt', 'test2.txt'),
+                testFile.replace('test.txt', 'test2.txt')
             );
             expect(file).to.equal(content);
         });
@@ -97,14 +97,14 @@ describe('Rename', function() {
             const renamedFolder = folderLocation.replace('test', 'test2');
             console.log(renamedFolder);
             const file = await podClient.read(
-                url.resolve(renamedFolder, 'testFile.txt'),
+                url.resolve(renamedFolder, 'testFile.txt')
             );
             expect(file).to.equal(content);
 
             const renamedNestedFolder = url.resolve(renamedFolder, 'test');
             console.log(renamedNestedFolder);
             const file2 = await podClient.read(
-                url.resolve(renamedNestedFolder + '/', 'testFile.txt'),
+                url.resolve(renamedNestedFolder + '/', 'testFile.txt')
             );
             expect(file2).to.equal(content);
         });
