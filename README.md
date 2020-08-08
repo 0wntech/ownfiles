@@ -56,8 +56,7 @@ Deleting a folder is indifferent from a file since both promises return nothing.
 ```javascript
 const url = "https://ludwig.owntech.de/profile/card#me";
 fileClient.delete(url).then(() => {
-  console.log("Successfully deleted");
-  // At this point the file would be deleted
+  ...
 });
 ```
 
@@ -69,8 +68,7 @@ To create a file with some payload you'll need to pass the payload, with the con
 const someContent = "Hello World!";
 const url = "https://ludwig.owntech.de/hello-world";
 fileClient.create(url, {contents: someContent, contentType: "text/plain"}).then(() => {
-  console.log("Successfully created");
-  // At this point the file would be successfully created
+  ...
 });
 ```
 
