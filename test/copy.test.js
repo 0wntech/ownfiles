@@ -18,7 +18,7 @@ describe('Copy', function() {
     });
 
     describe('copy()', function() {
-        it('should copy the specified file to the location', async function() {
+        it('should copy a file to the specified location', async function() {
             const content = 'Hello I am a text file.';
             await podClient.create(config.testFile, {
                 contentType: 'text/plain',
@@ -35,7 +35,17 @@ describe('Copy', function() {
             expect(file).to.equal(content);
         });
 
-        it('should copy the specified folder to the location', async function() {
+        it('should copy a non text file file to the specified location', async function() {
+            const copyLocation = url.resolve(config.podUrl, 'profile') + '/';
+            const content = await podClient.read(config.podUrl + 'favicon.ico');
+            await podClient.copy(config.podUrl + 'favicon.ico', copyLocation);
+            const file = await podClient.read(
+                url.resolve(copyLocation, 'favicon.ico')
+            );
+            expect(file).to.deep.equal(content);
+        });
+
+        it('should copy a folder to the specified location', async function() {
             const folderLocation = config.testFolder;
             const nestedFile = url.resolve(config.testFolder, 'testFile');
             const nestedFolder = url.resolve(folderLocation, 'test') + '/';
