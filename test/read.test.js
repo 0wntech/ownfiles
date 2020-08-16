@@ -59,6 +59,8 @@ describe('Read', function() {
             const file = await podClient.read(
                 config.testFile.replace('ttl', 'txt')
             );
+            const image = await podClient.read(config.podUrl + 'favicon.ico');
+            console.log(image);
             expect(file).to.equal(content);
         });
     });

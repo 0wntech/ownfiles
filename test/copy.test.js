@@ -72,7 +72,7 @@ describe('Copy', function() {
         });
     });
 
-    afterEach('Cleaning up', async function() {
+    afterEach('Cleaning up', function() {
         return new Promise(async (resolve, reject) => {
             const folder = await podClient.read(config.podUrl);
             cleanUps = [];
