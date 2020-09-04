@@ -20,10 +20,78 @@
         "files": [
             {
                 "name": "https://lalasepp1.solid.community/profile/card",
-                "type": "rdf"
+                "type": "text/turtle"
             }
         ]
     },
+    "fileIndex": [
+        {
+            "url": "https://lalasepp1.solid.community/",
+            "types": [
+                "text/turtle",
+                "image/jpeg",
+                "text/plain",
+                "image/vnd.microsoft.icon"
+            ]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/private/aa.jpeg",
+            "types": ["image/jpeg"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/private/",
+            "types": ["image/jpeg"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/favicon.ico",
+            "types": ["image/vnd.microsoft.icon"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/serverSide.ttl.inactive",
+            "types": ["null"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/robots.txt",
+            "types": ["text/plain"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/inbox/malte18",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/profile/card",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/fileIndex.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/prefs.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/privateTypeIndex.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/publicTypeIndex.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/inbox/",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/profile/",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/",
+            "types": ["text/turtle"]
+        },
+        { "url": "https://lalasepp1.solid.community/.well-known/", "types": [] }
+    ],
     "updateTestFile": "https://lalasepp1.solid.community/robots.txt",
     "updateTestContent": "User-agent: *\n# Allow all crawling (subject to ACLs as usual, of course)\nDisallow:",
     "timeOut": 20000

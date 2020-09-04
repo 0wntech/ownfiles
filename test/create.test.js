@@ -98,6 +98,17 @@ describe('Create', function() {
                     );
                 });
         });
+
+        it('should not create a plaintext file if it already exists', async function() {
+            const folderContents = await podClient.read(config.podUrl);
+            await podClient.createIfNotExist(config.podUrl + 'robots.txt', {
+                contentType: 'text/html',
+                contents: '<b>Hello I am a different text file.</b>',
+            });
+            await podClient.read(config.podUrl).then((res) => {
+                expect(res).to.deep.equal(folderContents);
+            });
+        });
     });
 
     after('Cleaning up...', async () => {
