@@ -26,12 +26,85 @@
     },
     "fileIndex": [
         {
+            "url": "https://lalasepp1.solid.community/settings/fileIndex.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/prefs.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/privateTypeIndex.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/publicTypeIndex.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/serverSide.ttl.inactive",
+            "types": ["text/plain"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/",
+            "types": ["text/turtle", "text/plain"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/profile/card",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/profile/",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/private/aa.jpeg",
+            "types": ["image/jpeg"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/private/",
+            "types": ["image/jpeg"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/inbox/19b96790-f120-11ea-9e0e-03acd6b5cc49.ttl",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/inbox/malte18",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/inbox/",
+            "types": ["text/turtle"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/.well-known/",
+            "types": []
+        },
+        {
             "url": "https://lalasepp1.solid.community/",
             "types": [
                 "text/turtle",
-                "image/jpeg",
                 "text/plain",
+                "image/jpeg",
                 "image/vnd.microsoft.icon"
+            ]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/robots.txt",
+            "types": ["text/plain"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/favicon.ico",
+            "types": ["image/vnd.microsoft.icon"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/",
+            "types": [
+                "image/jpeg",
+                "image/vnd.microsoft.icon",
+                "text/plain",
+                "text/turtle"
             ]
         },
         {
@@ -47,12 +120,20 @@
             "types": ["image/vnd.microsoft.icon"]
         },
         {
-            "url": "https://lalasepp1.solid.community/settings/serverSide.ttl.inactive",
-            "types": ["null"]
+            "url": "https://lalasepp1.solid.community/settings/",
+            "types": ["text/plain", "text/turtle"]
         },
         {
             "url": "https://lalasepp1.solid.community/robots.txt",
             "types": ["text/plain"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/settings/serverSide.ttl.inactive",
+            "types": ["text/plain"]
+        },
+        {
+            "url": "https://lalasepp1.solid.community/inbox/19b96790-f120-11ea-9e0e-03acd6b5cc49.ttl",
+            "types": ["text/turtle"]
         },
         {
             "url": "https://lalasepp1.solid.community/inbox/malte18",
@@ -84,10 +165,6 @@
         },
         {
             "url": "https://lalasepp1.solid.community/profile/",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solid.community/settings/",
             "types": ["text/turtle"]
         },
         { "url": "https://lalasepp1.solid.community/.well-known/", "types": [] }

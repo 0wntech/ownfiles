@@ -1,17 +1,19 @@
 {
     "env": {
         "browser": true,
-        "commonjs": true,
         "es6": true,
         "node": true
     },
-    "extends": ["google"],
+    "extends": ["plugin:@typescript-eslint/recommended"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
     },
     "parserOptions": {
-        "ecmaVersion": 2018
+        "ecmaVersion": 2020,
+        "sourceType": "module"
     },
     "rules": {
         "comma-dangle": 0,
@@ -20,6 +22,7 @@
         "indent": 0,
         "require-jsdoc": 0,
         "object-curly-spacing": ["error", "always"],
-        "quote-props": "warn"
+        "quote-props": "warn",
+        "@typescript-eslint/no-var-requires": 0
     }
 }

@@ -1,8 +1,12 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
+
+import FileClient from '../lib';
+
 const auth = require('solid-auth-cli');
 const rdf = require('rdflib');
-const FileClient = require('../lib/index.js');
+
 const config = require('./podConfig.json');
+
 const podClient = new FileClient();
 
 describe('Update', function() {
@@ -11,14 +15,14 @@ describe('Update', function() {
         const credentials = await auth.getCredentials();
         await auth.login(credentials);
         podClient.fetcher = new rdf.Fetcher(podClient.graph, {
-            fetch: auth.fetch,
+            "fetch": auth.fetch,
         });
     });
 
     after('Cleaning up', async function() {
         return podClient.update(
             config.updateTestFile,
-            config.updateTestContent
+            config.updateTestContent,
         );
     });
 
