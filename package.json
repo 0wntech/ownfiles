@@ -1,6 +1,6 @@
 {
     "name": "ownfiles",
-    "version": "1.2.33",
+    "version": "1.2.34",
     "description": "A library to manage files in a Solid User's Pod",
     "main": "src",
     "scripts": {
