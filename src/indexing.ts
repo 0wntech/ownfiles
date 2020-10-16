@@ -3,7 +3,7 @@ import FileClient from './index';
 import rdf = require('rdflib');
 import ns = require('solid-namespace');
 const typeNamespaceUrl = 'http://www.w3.org/ns/iana/media-types/';
-const types = new rdf.Namespace(typeNamespaceUrl);
+const types = rdf.Namespace(typeNamespaceUrl);
 
 export const createIndex = async function(this: FileClient, user: string) {
     const userUrl = url.parse(user);
@@ -70,9 +70,8 @@ const getNewIndexTriples = (
     graph: any,
     indexUrl: string,
 ) => {
-    const statement = rdf.st();
-    const del: typeof statement[] = [];
-    const ins: typeof statement[] = [];
+    const del: rdf.Statement[] = [];
+    const ins: rdf.Statement[] = [];
     items.forEach((item) => {
         if (item.type === 'folder') {
             let rootNode = graph.any(
@@ -93,13 +92,13 @@ const getNewIndexTriples = (
                         currentItem.type !== 'folder'
                             ? [
                                   ...allTypes,
-                                  types(currentItem.type + '#Resource'),
+                                  types(currentItem.type + '#Resource').value,
                               ]
                             : allTypes,
                     [],
                 )
                 .filter(
-                    (currentType: string, index, allNodes: string[]) =>
+                    (currentType: string, index: number, allNodes: string[]) =>
                         allNodes.findIndex(
                             (type: string) => currentType === type,
                         ) === index,
@@ -128,7 +127,7 @@ const getNewIndexTriples = (
                         rdf.st(
                             rootNode,
                             ns(rdf).solid('forClass'),
-                            type,
+                            rdf.sym(type),
                             rdf.sym(indexUrl),
                         ),
                     ),
@@ -160,14 +159,14 @@ const getNewIndexTriples = (
                             ns(rdf).solid('forClass'),
                             rdf.sym(type),
                         )
-                        .forEach((st: typeof statement) => del.push(st)),
+                        .forEach((st: rdf.Statement) => del.push(st)),
                 );
                 typesToAdd.forEach((type: string) =>
                     ins.push(
                         rdf.st(
                             rootNode,
                             ns(rdf).solid('forClass'),
-                            type,
+                            rdf.sym(type),
                             rdf.sym(indexUrl),
                         ),
                     ),
@@ -209,12 +208,12 @@ const getNewIndexTriples = (
             } else {
                 const currentType = graph
                     .any(rootNode, ns(rdf).solid('forClass'), null)
-                    .value.replace(types(), '')
+                    .value.replace(typeNamespaceUrl, '')
                     .replace('#Resource', '');
                 if (currentType !== item.type) {
                     graph
                         .statementsMatching(rootNode, ns(rdf).solid('forClass'))
-                        .forEach((st: typeof statement) => del.push(st));
+                        .forEach((st: rdf.Statement) => del.push(st));
                     ins.push(
                         rdf.st(
                             rootNode,
