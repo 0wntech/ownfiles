@@ -18,10 +18,12 @@ The [Solid](https://solid.mit.edu/) project allows people to use apps on the Web
 
 ## Installing
 
-Currently ownfiles is only available as an npm package:
 `npm install ownfiles`  
-The library is intended for browser usage, to use it in a node environment you'll need to add a credentials file as described in [Authenticating](#authenticating)
 
+The library is intended for browser usage, to use it in a node environment you'll need to add a credentials file as described in [Authentication](#authentication)
+
+
+## Constructor
 To get started you need to import and instantiate the fileClient with either a [WebId](https://github.com/solid/solid-spec/blob/master/solid-webid-profiles.md) or the root url of an existing pod:
 ```javascript
 import FileClient from 'ownfiles';
