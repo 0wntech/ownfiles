@@ -1,4 +1,4 @@
-import rdf = require('rdflib');
+import * as rdf from 'rdflib';
 import {
     create,
     createFile,

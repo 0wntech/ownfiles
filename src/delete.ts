@@ -1,7 +1,7 @@
 import FileClient from './fileClient';
 
-import rdf = require('rdflib');
-import ns = require('solid-namespace');
+import * as rdf from 'rdflib';
+import ns from 'solid-namespace';
 
 export const deleteResource = function(
     this: FileClient,

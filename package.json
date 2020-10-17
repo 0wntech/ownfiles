@@ -1,8 +1,8 @@
 {
     "name": "ownfiles",
-    "version": "1.2.35",
+    "version": "1.2.36",
     "description": "A library to manage files in a Solid User's Pod",
-    "main": "lib",
+    "main": "lib/index.js",
     "scripts": {
         "build": "rm -rf lib && tsc",
         "test": "npm run build && mocha -r ts-node/register --timeout=20000 test/*.test.ts",

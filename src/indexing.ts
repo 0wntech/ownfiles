@@ -1,7 +1,7 @@
 import url from 'url';
 import FileClient from './index';
-import rdf = require('rdflib');
-import ns = require('solid-namespace');
+import * as rdf from 'rdflib';
+const ns = require('solid-namespace')(rdf);
 const typeNamespaceUrl = 'http://www.w3.org/ns/iana/media-types/';
 const types = rdf.Namespace(typeNamespaceUrl);
 
@@ -47,13 +47,13 @@ const readIndexTriples = (indexUrl: string, graph: any) => {
     }
     const index: { url: string; types: string }[] = [];
     graph
-        .each(null, ns(rdf).rdf('type'), ns(rdf).solid('TypeRegistration'))
+        .each(null, ns.rdf('type'), ns.solid('TypeRegistration'))
         .forEach((indexNode: { value: string }) => {
             const urlNode =
-                graph.any(indexNode, ns(rdf).solid('instance')) ||
-                graph.any(indexNode, ns(rdf).solid('instanceContainer'));
+                graph.any(indexNode, ns.solid('instance')) ||
+                graph.any(indexNode, ns.solid('instanceContainer'));
             const nodeTypes = graph
-                .statementsMatching(indexNode, ns(rdf).solid('forClass'))
+                .statementsMatching(indexNode, ns.solid('forClass'))
                 .map((statement: { object: { value: string } }) =>
                     statement.object.value
                         .replace(typeNamespaceUrl, '')
@@ -76,7 +76,7 @@ const getNewIndexTriples = (
         if (item.type === 'folder') {
             let rootNode = graph.any(
                 null,
-                ns(rdf).solid('instanceContainer'),
+                ns.solid('instanceContainer'),
                 rdf.sym(item.url),
             );
 
@@ -109,15 +109,15 @@ const getNewIndexTriples = (
                 ins.push(
                     rdf.st(
                         rootNode,
-                        ns(rdf).rdf('type'),
-                        ns(rdf).solid('TypeRegistration'),
+                        ns.rdf('type'),
+                        ns.solid('TypeRegistration'),
                         rdf.sym(indexUrl),
                     ),
                 );
                 ins.push(
                     rdf.st(
                         rootNode,
-                        ns(rdf).solid('instanceContainer'),
+                        ns.solid('instanceContainer'),
                         rdf.sym(item.url),
                         rdf.sym(indexUrl),
                     ),
@@ -126,7 +126,7 @@ const getNewIndexTriples = (
                     ins.push(
                         rdf.st(
                             rootNode,
-                            ns(rdf).solid('forClass'),
+                            ns.solid('forClass'),
                             rdf.sym(type),
                             rdf.sym(indexUrl),
                         ),
@@ -134,7 +134,7 @@ const getNewIndexTriples = (
                 );
             } else {
                 const typesFound = graph
-                    .each(rootNode, ns(rdf).solid('forClass'), null)
+                    .each(rootNode, ns.solid('forClass'), null)
                     .map((node: { value: string }) => node.value);
                 const typesToDelete = typesFound.reduce(
                     (notFoundTypes: string[], type: string) =>
@@ -156,7 +156,7 @@ const getNewIndexTriples = (
                     graph
                         .statementsMatching(
                             rootNode,
-                            ns(rdf).solid('forClass'),
+                            ns.solid('forClass'),
                             rdf.sym(type),
                         )
                         .forEach((st: rdf.Statement) => del.push(st)),
@@ -165,7 +165,7 @@ const getNewIndexTriples = (
                     ins.push(
                         rdf.st(
                             rootNode,
-                            ns(rdf).solid('forClass'),
+                            ns.solid('forClass'),
                             rdf.sym(type),
                             rdf.sym(indexUrl),
                         ),
@@ -175,7 +175,7 @@ const getNewIndexTriples = (
         } else {
             let rootNode = graph.any(
                 null,
-                ns(rdf).solid('instance'),
+                ns.solid('instance'),
                 rdf.sym(item.url),
             );
 
@@ -184,15 +184,15 @@ const getNewIndexTriples = (
                 ins.push(
                     rdf.st(
                         rootNode,
-                        ns(rdf).rdf('type'),
-                        ns(rdf).solid('TypeRegistration'),
+                        ns.rdf('type'),
+                        ns.solid('TypeRegistration'),
                         rdf.sym(indexUrl),
                     ),
                 );
                 ins.push(
                     rdf.st(
                         rootNode,
-                        ns(rdf).solid('instance'),
+                        ns.solid('instance'),
                         rdf.sym(item.url),
                         rdf.sym(indexUrl),
                     ),
@@ -200,24 +200,24 @@ const getNewIndexTriples = (
                 ins.push(
                     rdf.st(
                         rootNode,
-                        ns(rdf).solid('forClass'),
+                        ns.solid('forClass'),
                         types(item.type + '#Resource'),
                         rdf.sym(indexUrl),
                     ),
                 );
             } else {
                 const currentType = graph
-                    .any(rootNode, ns(rdf).solid('forClass'), null)
+                    .any(rootNode, ns.solid('forClass'), null)
                     .value.replace(typeNamespaceUrl, '')
                     .replace('#Resource', '');
                 if (currentType !== item.type) {
                     graph
-                        .statementsMatching(rootNode, ns(rdf).solid('forClass'))
+                        .statementsMatching(rootNode, ns.solid('forClass'))
                         .forEach((st: rdf.Statement) => del.push(st));
                     ins.push(
                         rdf.st(
                             rootNode,
-                            ns(rdf).solid('forClass'),
+                            ns.solid('forClass'),
                             types(item.type + '#Resource'),
                             rdf.sym(indexUrl),
                         ),

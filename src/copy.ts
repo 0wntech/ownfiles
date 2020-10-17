@@ -2,8 +2,8 @@ import { CreateOptions } from './create';
 import url from 'url';
 import FileClient from './fileClient';
 
-import rdf = require('rdflib');
-import ns = require('solid-namespace');
+import * as rdf from 'rdflib';
+import ns from 'solid-namespace';
 import { SingleFileType, FolderType } from './read';
 
 export const copy = function(

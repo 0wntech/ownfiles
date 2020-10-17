@@ -1,8 +1,8 @@
 import mime from 'mime';
 import url from 'url';
 
-import rdf = require('rdflib');
-import ns = require('solid-namespace');
+import * as rdf from 'rdflib';
+import ns from 'solid-namespace';
 
 import { CreateOptions } from './create';
 import FileClient from './fileClient';
