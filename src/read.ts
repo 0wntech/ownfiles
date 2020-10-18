@@ -12,7 +12,7 @@ export interface ReadOptions {
 
 export interface FolderType {
     folders: string[];
-    files: ({ name: string; type: string } | string)[];
+    files: (FileType | string)[];
 }
 
 export interface FileType {
@@ -29,10 +29,10 @@ export const read = async function(
     this: FileClient,
     resource: string,
     options: Partial<ReadOptions> = {
-        "auth": false,
-        "verbose": false,
-        "headers": {
-            "Accept": mime.getType(resource) ?? 'text/turtle',
+        auth: false,
+        verbose: false,
+        headers: {
+            Accept: mime.getType(resource) ?? 'text/turtle',
         },
     },
 ) {
@@ -44,11 +44,11 @@ export const read = async function(
 
     if (options.auth) {
         response = await options.auth.fetch(resource, {
-            "headers": options.headers,
+            headers: options.headers,
         });
     } else {
         response = await fetcher._fetch(resource, {
-            "headers": options.headers,
+            headers: options.headers,
         });
     }
     const contentType = response.headers.get('Content-Type');
@@ -65,7 +65,7 @@ export const read = async function(
             return parseResult(resource, store, options.verbose);
         } else {
             if (options.verbose) {
-                return { "body": text, "contentType": contentType };
+                return { body: text, contentType: contentType };
             } else {
                 return text;
             }
@@ -75,7 +75,7 @@ export const read = async function(
             ? await response.blob()
             : await response.buffer();
         if (options.verbose) {
-            return { "body": body, "contentType": contentType };
+            return { body: body, contentType: contentType };
         } else {
             return body;
         }
@@ -98,7 +98,7 @@ const isFolder = (result: string, resource: string, store: any) => {
 };
 
 const parseResult = (resource: string, store: any, verbose = false) => {
-    const containments: FolderType = { "folders": [], "files": [] };
+    const containments: FolderType = { folders: [], files: [] };
     store
         .each(rdf.sym(resource), ns(rdf).ldp('contains'), undefined)
         .map((result: { value: string }) => {
@@ -134,8 +134,8 @@ const parseResult = (resource: string, store: any, verbose = false) => {
             } else {
                 if (verbose) {
                     containments.files.push({
-                        "name": result,
-                        "type": !isLinked
+                        name: result,
+                        type: !isLinked
                             ? mime.getType(result) ?? 'text/plain'
                             : 'text/turtle',
                     });

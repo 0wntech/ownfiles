@@ -5,11 +5,11 @@ export const deepRead = async function(
     this: FileClient,
     folderUrl: string,
     options: Partial<{ auth: any; verbose: boolean }> = {
-        "auth": null,
-        "verbose": false,
+        auth: null,
+        verbose: false,
     },
 ) {
-    const deepRead = await this.read(folderUrl, { "verbose": true })
+    const deepRead = await this.read(folderUrl, { verbose: true })
         .then((folder) => {
             folder = folder as FolderType;
             const folderList = folder.folders.map((folder: string) =>
@@ -21,8 +21,8 @@ export const deepRead = async function(
                         if (typeof file !== 'string') {
                             if (options.verbose) {
                                 resolve({
-                                    "url": file.name,
-                                    "type": file.type,
+                                    url: file.name,
+                                    type: file.type,
                                 });
                             } else {
                                 resolve(file.name);
@@ -37,7 +37,7 @@ export const deepRead = async function(
                 ...fileList,
                 new Promise(function(resolve) {
                     if (options.verbose) {
-                        resolve({ "url": folderUrl, "type": 'folder' });
+                        resolve({ url: folderUrl, type: 'folder' });
                     } else {
                         resolve(folderUrl);
                     }
@@ -46,7 +46,7 @@ export const deepRead = async function(
         })
         .catch(() =>
             options.verbose
-                ? [{ "url": folderUrl, "type": 'folder' }]
+                ? [{ url: folderUrl, type: 'folder' }]
                 : [folderUrl],
         )
         .then(function(results: any[]) {

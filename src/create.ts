@@ -7,7 +7,7 @@ export interface CreateOptions {
     name: string;
     contents: any[] | Blob | string;
     contentType: string;
-    headers?: Record<string, string | number>;
+    headers?: Headers | Record<string, string>;
 }
 
 export const create = function(
@@ -51,9 +51,9 @@ export const createFolder = function(
     options?: Partial<CreateOptions>,
 ): Promise<Response> {
     const request = {
-        "headers": {
-            "slug": options?.name ?? 'Untitled Folder',
-            "link": '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"',
+        headers: {
+            Slug: options?.name ?? 'Untitled Folder',
+            Link: '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"',
             'Content-Type': 'text/turtle',
         },
     };
@@ -89,8 +89,8 @@ export const createFile = function(
     }
 
     const request = {
-        "contentType": options.contentType,
-        "data": body,
+        contentType: options.contentType,
+        data: body,
     };
 
     return this.fetcher.webOperation('PUT', fileAddress, request);
@@ -99,10 +99,10 @@ export const createFile = function(
 export const createIfNotExist = function(
     this: FileClient,
     resourceAddress: string,
-    options: Partial<CreateOptions> = { "headers": {} },
-): Promise<Response> | void {
+    options: Partial<CreateOptions> = { headers: {} },
+): Promise<Response | undefined> {
     return this.fetcher
-        ._fetch(resourceAddress, { "headers": options.headers })
+        ._fetch(resourceAddress, { headers: options.headers })
         .then((res: Response) => {
             if (res.status === 200) {
                 return;

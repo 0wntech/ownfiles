@@ -41,7 +41,7 @@ describe('Create', function() {
             ];
             await podClient
                 .create(config.testFile, {
-                    "contents": contents,
+                    contents: contents,
                 })
                 .then(() => {
                     const store = rdf.graph();
@@ -59,23 +59,22 @@ describe('Create', function() {
 
         it('should create a plaintext file at the specified url with the contents', async function() {
             await podClient.create(config.testFile, {
-                "contentType": 'text/plain',
-                "contents": 'Hello I am a text file.',
+                contentType: 'text/plain',
+                contents: 'Hello I am a text file.',
             });
-            await podClient.fetcher
-                .load(config.testFile.replace('ttl', 'txt'))
-                .then((res: Response & { responseText: string }) => {
-                    expect(res.responseText).to.equal(
-                        'Hello I am a text file.',
-                    );
-                });
+            const res = (await podClient.fetcher.load(
+                config.testFile.replace('ttl', 'txt'),
+            )) as Response & {
+                responseText: string;
+            };
+            expect(res.responseText).to.equal('Hello I am a text file.');
         });
 
         it('should not create a plaintext file if it already exists', async function() {
             const folderContents = await podClient.read(config.podUrl);
             await podClient.createIfNotExist(config.podUrl + 'robots.txt', {
-                "contentType": 'text/html',
-                "contents": '<b>Hello I am a different text file.</b>',
+                contentType: 'text/html',
+                contents: '<b>Hello I am a different text file.</b>',
             });
             const folder = (await podClient.read(config.podUrl)) as FolderType;
             expect(folder).to.deep.equal(folderContents);

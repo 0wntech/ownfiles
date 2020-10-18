@@ -10,7 +10,7 @@ export const update = function(
 ) {
     if (getType(resource)) contentType = getType(resource) ?? contentType;
     return this.fetcher.webOperation('PUT', resource, {
-        "data": content,
-        "contentType": contentType,
-    });
+        data: content,
+        contentType: contentType,
+    }) as Promise<Response>;
 };

@@ -12,12 +12,20 @@ import { update } from './update';
 import { renameFile, renameFolder } from './rename';
 import * as deleting from './delete';
 import { deepRead } from './deepRead';
-import { createIndex, readIndex, deleteIndex } from './indexing';
+import {
+    createIndex,
+    readIndex,
+    deleteIndex,
+    addToIndex,
+    deleteFromIndex,
+    updateIndexFor,
+    IndexType,
+} from './indexing';
 
 export default class FileClient {
-    graph: any;
-    fetcher: any;
-    updater: any;
+    graph: rdf.IndexedFormula;
+    fetcher: rdf.Fetcher;
+    updater: rdf.UpdateManager;
     create: (
         this: FileClient,
         resourceAddress: string,
@@ -37,7 +45,7 @@ export default class FileClient {
         this: FileClient,
         folderAddress: string,
         options?: Partial<CreateOptions> | undefined,
-    ) => Promise<Response> | void;
+    ) => Promise<Response | undefined>;
     read: (
         this: FileClient,
         resource: string,
@@ -77,12 +85,15 @@ export default class FileClient {
     createIndex: (
         this: FileClient,
         user: string,
-    ) => Promise<{ url: string; types: string[] }[] | undefined>;
+    ) => Promise<IndexType[] | undefined>;
     deleteIndex: (this: FileClient, user: string) => Promise<unknown>;
     readIndex: (
         this: FileClient,
         user: string,
-    ) => Promise<{ url: string; types: string[] }[] | undefined>;
+    ) => Promise<IndexType[] | undefined>;
+    addToIndex: (this: FileClient, item: string) => Promise<void[]>;
+    deleteFromIndex: (this: FileClient, item: string) => Promise<void[]>;
+    updateIndexFor: (this: FileClient, item: string) => Promise<void>;
     copyFile: (
         this: FileClient,
         resource: string,
@@ -113,6 +124,9 @@ export default class FileClient {
         this.createIndex = createIndex;
         this.deleteIndex = deleteIndex;
         this.readIndex = readIndex;
+        this.addToIndex = addToIndex;
+        this.deleteFromIndex = deleteFromIndex;
+        this.updateIndexFor = updateIndexFor;
         this.copyFile = copyFile;
         this.copyFolder = copyFolder;
     }

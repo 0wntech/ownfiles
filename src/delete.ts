@@ -29,44 +29,42 @@ export const deleteRecursively = function(this: FileClient, resource: string) {
 
     return new Promise((resolve, reject) => {
         fetcher
-            .load(resource, { "force": true, "clearPreviousData": true })
+            .load(resource, { force: true, clearPreviousData: true })
             .then(() => {
                 const files = store.each(
                     rdf.sym(resource),
                     ns(rdf).ldp('contains'),
-                );
-                const promises = files.map(
-                    (file: { value: string; uri: string }) => {
-                        if (
-                            store.holds(
-                                file,
-                                ns(rdf).rdf('type'),
-                                ns(rdf).ldp('BasicContainer'),
-                            )
-                        ) {
-                            const fileFragments = file.uri.split('/');
-                            const folderName =
-                                fileFragments[fileFragments.length - 2];
-                            if (resource.endsWith('/')) {
-                                return this.deleteRecursively(
-                                    resource + folderName + '/',
-                                );
-                            } else {
-                                return this.deleteRecursively(
-                                    resource + '/' + folderName + '/',
-                                );
-                            }
+                ) as rdf.NamedNode[];
+                const promises = files.map((file) => {
+                    if (
+                        store.holds(
+                            file,
+                            ns(rdf).rdf('type'),
+                            ns(rdf).ldp('BasicContainer'),
+                        )
+                    ) {
+                        const fileFragments = file.uri.split('/');
+                        const folderName =
+                            fileFragments[fileFragments.length - 2];
+                        if (resource.endsWith('/')) {
+                            return this.deleteRecursively(
+                                resource + folderName + '/',
+                            );
                         } else {
-                            const fileFragments = file.uri.split('/');
-                            const fileName =
-                                fileFragments[fileFragments.length - 1];
-                            return fetcher.webOperation(
-                                'DELETE',
-                                resource + fileName,
+                            return this.deleteRecursively(
+                                resource + '/' + folderName + '/',
                             );
                         }
-                    },
-                );
+                    } else {
+                        const fileFragments = file.uri.split('/');
+                        const fileName =
+                            fileFragments[fileFragments.length - 1];
+                        return fetcher.webOperation(
+                            'DELETE',
+                            resource + fileName,
+                        );
+                    }
+                });
                 Promise.all(promises).then(() => {
                     fetcher
                         .webOperation('DELETE', resource)
