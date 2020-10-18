@@ -9,7 +9,10 @@ export const deepRead = async function(
         verbose: false,
     },
 ) {
-    const deepRead = await this.read(folderUrl, { verbose: true })
+    const deepRead = await this.read(folderUrl, {
+        verbose: true,
+        headers: { Accept: 'text/turtle' },
+    })
         .then((folder) => {
             folder = folder as FolderType;
             const folderList = folder.folders.map((folder: string) =>
