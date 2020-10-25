@@ -20,6 +20,7 @@ import {
     addToIndex,
     deleteFromIndex,
     updateIndexFor,
+    IndexType,
 } from './indexing';
 
 export default class FileClient {
@@ -89,14 +90,18 @@ export default class FileClient {
     createIndex: (
         this: FileClient,
         user: string,
-        items?: (FileIndexEntry | FolderIndexEntry)[],
-    ) => Promise<(FileIndexEntry | FolderIndexEntry)[] | undefined>;
+        items?: IndexType,
+    ) => Promise<IndexType | undefined>;
     deleteIndex: (this: FileClient, user: string) => Promise<unknown>;
     readIndex: (
         this: FileClient,
         user: string,
-    ) => Promise<(FileIndexEntry | FolderIndexEntry)[] | undefined>;
-    addToIndex: (this: FileClient, item: string) => Promise<void[]>;
+    ) => Promise<IndexType | undefined>;
+    addToIndex: (
+        this: FileClient,
+        item: string,
+        items?: IndexType,
+    ) => Promise<void[]>;
     deleteFromIndex: (this: FileClient, item: string) => Promise<void[]>;
     updateIndexFor: (this: FileClient, item: string) => Promise<void>;
     copyFile: (

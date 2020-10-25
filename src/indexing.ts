@@ -6,10 +6,12 @@ const ns = require('solid-namespace')(rdf);
 const typeNamespaceUrl = 'http://www.w3.org/ns/iana/media-types/';
 const types = rdf.Namespace(typeNamespaceUrl);
 
+export type IndexType = (FileIndexEntry | FolderIndexEntry)[];
+
 export const createIndex = async function(
     this: FileClient,
     url: string,
-    items?: (FileIndexEntry | FolderIndexEntry)[],
+    items?: IndexType,
 ) {
     const parsedUrl = urlUtils.parse(url);
     const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
@@ -115,7 +117,11 @@ export const deleteFromIndex = async function(this: FileClient, item: string) {
     );
 };
 
-export const addToIndex = async function(this: FileClient, item: string) {
+export const addToIndex = async function(
+    this: FileClient,
+    item: string,
+    index?: IndexType,
+) {
     const parsedItemUrl = urlUtils.parse(item);
     const rootUrl = `${parsedItemUrl.protocol}//${parsedItemUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
@@ -123,7 +129,7 @@ export const addToIndex = async function(this: FileClient, item: string) {
         verbose: true,
     })) as (FileIndexEntry | FolderIndexEntry)[];
     await this.createIfNotExist(indexUrl);
-    const index = await this.readIndex(rootUrl);
+    index = (index as IndexType) ?? (await this.readIndex(rootUrl));
     const itemsToUpdate = index?.reduce(
         (itemsToUpdate: (FileIndexEntry | FolderIndexEntry)[], entry) => {
             const entryUrl = urlUtils.parse(entry.url);
