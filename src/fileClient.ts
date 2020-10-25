@@ -99,8 +99,8 @@ export default class FileClient {
     ) => Promise<IndexType | undefined>;
     addToIndex: (
         this: FileClient,
-        item: string,
-        force?: boolean,
+        item: FileIndexEntry | FolderIndexEntry | string,
+        options?: { force?: boolean },
     ) => Promise<void[]>;
     deleteFromIndex: (this: FileClient, item: string) => Promise<void[]>;
     updateIndexFor: (this: FileClient, item: string) => Promise<void>;
