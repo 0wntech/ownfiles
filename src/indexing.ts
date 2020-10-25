@@ -120,18 +120,17 @@ export const deleteFromIndex = async function(this: FileClient, item: string) {
 export const addToIndex = async function(
     this: FileClient,
     item: string,
-    index?: IndexType,
+    force?: boolean,
 ) {
     const parsedItemUrl = urlUtils.parse(item);
     const rootUrl = `${parsedItemUrl.protocol}//${parsedItemUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
-    const itemsToAdd =
-        (index as IndexType) ??
-        ((await this.deepRead(item, {
+    const itemsToAdd = (!force &&
+        (await this.deepRead(item, {
             verbose: true,
-        })) as (FileIndexEntry | FolderIndexEntry)[]);
+        }))) as (FileIndexEntry | FolderIndexEntry)[];
     await this.createIfNotExist(indexUrl);
-    index = (index as IndexType) ?? (await this.readIndex(rootUrl));
+    const index = (await this.readIndex(rootUrl)) as IndexType;
     const itemsToUpdate = index?.reduce(
         (itemsToUpdate: (FileIndexEntry | FolderIndexEntry)[], entry) => {
             const entryUrl = urlUtils.parse(entry.url);
