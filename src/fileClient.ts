@@ -89,6 +89,7 @@ export default class FileClient {
     createIndex: (
         this: FileClient,
         user: string,
+        items?: (FileIndexEntry | FolderIndexEntry)[],
     ) => Promise<(FileIndexEntry | FolderIndexEntry)[] | undefined>;
     deleteIndex: (this: FileClient, user: string) => Promise<unknown>;
     readIndex: (

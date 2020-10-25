@@ -6,15 +6,21 @@ const ns = require('solid-namespace')(rdf);
 const typeNamespaceUrl = 'http://www.w3.org/ns/iana/media-types/';
 const types = rdf.Namespace(typeNamespaceUrl);
 
-export const createIndex = async function(this: FileClient, url: string) {
+export const createIndex = async function(
+    this: FileClient,
+    url: string,
+    items?: (FileIndexEntry | FolderIndexEntry)[],
+) {
     const parsedUrl = urlUtils.parse(url);
     const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
     await this.createIfNotExist(indexUrl);
-    const items = (await this.deepRead(url, { verbose: true })) as (
-        | FileIndexEntry
-        | FolderIndexEntry
-    )[];
+    items =
+        (items as (FileIndexEntry | FolderIndexEntry)[]) ??
+        ((await this.deepRead(url, { verbose: true })) as (
+            | FileIndexEntry
+            | FolderIndexEntry
+        )[]);
 
     const [del, ins] = getNewIndexTriples(items, this.graph, indexUrl);
 

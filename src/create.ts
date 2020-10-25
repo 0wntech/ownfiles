@@ -72,7 +72,8 @@ export const createFolder = async function(
         request,
     )) as ExtendedResponseType;
     const location = res.headers.get('Location');
-    if (location && res.status < 300) {
+
+    if (location && res.status < 304) {
         const parsedUrl = url.parse(folderAddress);
         const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
         await this.addToIndex(rootUrl + location);
