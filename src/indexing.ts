@@ -125,9 +125,11 @@ export const addToIndex = async function(
     const parsedItemUrl = urlUtils.parse(item);
     const rootUrl = `${parsedItemUrl.protocol}//${parsedItemUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
-    const itemsToAdd = (await this.deepRead(item, {
-        verbose: true,
-    })) as (FileIndexEntry | FolderIndexEntry)[];
+    const itemsToAdd =
+        (index as IndexType) ??
+        ((await this.deepRead(item, {
+            verbose: true,
+        })) as (FileIndexEntry | FolderIndexEntry)[]);
     await this.createIfNotExist(indexUrl);
     index = (index as IndexType) ?? (await this.readIndex(rootUrl));
     const itemsToUpdate = index?.reduce(
