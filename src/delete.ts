@@ -1,7 +1,5 @@
+import { ExtendedResponseType } from './create';
 import FileClient from './fileClient';
-
-import * as rdf from 'rdflib';
-import ns from 'solid-namespace';
 
 export const deleteResource = function(
     this: FileClient,
@@ -9,10 +7,11 @@ export const deleteResource = function(
 ) {
     if (resources) {
         if (Array.isArray(resources)) {
-            resources.map((item) => {
-                return this.deleteRecursively(item);
-            });
-            return Promise.all(resources);
+            return Promise.all(
+                resources.map((item) => {
+                    return this.deleteRecursively(item);
+                }),
+            );
         } else {
             return this.deleteRecursively(resources);
         }
@@ -23,72 +22,22 @@ export const deleteResource = function(
     }
 };
 
-export const deleteRecursively = function(this: FileClient, resource: string) {
-    const store = this.graph;
-    const fetcher = this.fetcher;
-
-    return new Promise((resolve, reject) => {
-        fetcher
-            .load(resource, { force: true, clearPreviousData: true })
-            .then(() => {
-                const files = store.each(
-                    rdf.sym(resource),
-                    ns(rdf).ldp('contains'),
-                ) as rdf.NamedNode[];
-                const promises = files.map((file) => {
-                    if (
-                        store.holds(
-                            file,
-                            ns(rdf).rdf('type'),
-                            ns(rdf).ldp('BasicContainer'),
-                        )
-                    ) {
-                        const fileFragments = file.uri.split('/');
-                        const folderName =
-                            fileFragments[fileFragments.length - 2];
-                        if (resource.endsWith('/')) {
-                            return this.deleteRecursively(
-                                resource + folderName + '/',
-                            );
-                        } else {
-                            return this.deleteRecursively(
-                                resource + '/' + folderName + '/',
-                            );
-                        }
-                    } else {
-                        const fileFragments = file.uri.split('/');
-                        const fileName =
-                            fileFragments[fileFragments.length - 1];
-                        return fetcher.webOperation(
-                            'DELETE',
-                            resource + fileName,
-                        );
-                    }
-                });
-                Promise.all(promises).then(() => {
-                    fetcher
-                        .webOperation('DELETE', resource)
-                        .then((res: Response) => {
-                            console.log(
-                                `DEBUG -- Successfully deleted ${resource}`,
-                            );
-                            resolve(res);
-                        })
-                        .catch((err: Error) => {
-                            reject(err);
-                        });
-                });
-            })
-            .catch((err: Error) => {
-                console.log(err);
-                fetcher
-                    .webOperation('DELETE', resource)
-                    .then((res: Response) => {
-                        resolve(res);
-                    })
-                    .catch((err: Error) => {
-                        reject(err);
-                    });
-            });
-    });
+export const deleteRecursively = async function(
+    this: FileClient,
+    resource: string,
+) {
+    const fileHierarchy = (await this.deepRead(resource)) as string[];
+    if (fileHierarchy.length > 1) {
+        return (await this.fetcher.webOperation(
+            'DELETE',
+            fileHierarchy[0],
+        )) as ExtendedResponseType;
+    } else {
+        const responses = await Promise.all(
+            fileHierarchy.map((item) =>
+                this.fetcher.webOperation('DELETE', item),
+            ) as Promise<ExtendedResponseType>[],
+        );
+        return responses[responses.length - 1];
+    }
 };

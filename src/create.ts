@@ -2,6 +2,7 @@ import url from 'url';
 import mime from 'mime';
 
 import FileClient from './fileClient';
+import { Quad_Subject } from 'rdflib/lib/tf-types';
 
 export interface CreateOptions {
     name: string;
@@ -9,6 +10,13 @@ export interface CreateOptions {
     contentType: string;
     headers?: Headers | Record<string, string>;
 }
+
+export type ExtendedResponseType = Response & {
+    responseText: string;
+    req?: Quad_Subject;
+    size: number;
+    error: string;
+};
 
 export const create = function(
     this: FileClient,
@@ -45,12 +53,13 @@ export const create = function(
     }
 };
 
-export const createFolder = function(
+export const createFolder = async function(
     this: FileClient,
     folderAddress: string,
     options?: Partial<CreateOptions>,
-): Promise<Response> {
+) {
     const request = {
+        method: 'POST',
         headers: {
             Slug: options?.name ?? 'Untitled Folder',
             Link: '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"',
@@ -58,10 +67,21 @@ export const createFolder = function(
         },
     };
 
-    return this.fetcher.webOperation('POST', folderAddress, request);
+    const res = (await this.fetcher._fetch(
+        folderAddress,
+        request,
+    )) as ExtendedResponseType;
+    const location = res.headers.get('Location');
+    if (location && res.status < 300) {
+        const parsedUrl = url.parse(folderAddress);
+        const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+        await this.addToIndex(rootUrl + location);
+    }
+
+    return res;
 };
 
-export const createFile = function(
+export const createFile = async function(
     this: FileClient,
     fileAddress: string,
     options: Partial<CreateOptions> = {},
@@ -93,7 +113,15 @@ export const createFile = function(
         data: body,
     };
 
-    return this.fetcher.webOperation('PUT', fileAddress, request);
+    const res = await this.fetcher.webOperation('PUT', fileAddress, request);
+    const location = res.headers.get('Location') || url.parse(res.url).pathname;
+    if (location && res.status < 300) {
+        const parsedUrl = url.parse(fileAddress);
+        const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+        await this.addToIndex(rootUrl + location);
+    }
+
+    return res;
 };
 
 export const createIfNotExist = function(
@@ -102,7 +130,7 @@ export const createIfNotExist = function(
     options: Partial<CreateOptions> = { headers: {} },
 ): Promise<Response | undefined> {
     return this.fetcher
-        ._fetch(resourceAddress, { headers: options.headers })
+        ._fetch(resourceAddress, { method: 'HEAD', headers: options.headers })
         .then((res: Response) => {
             if (res.status === 200) {
                 return;

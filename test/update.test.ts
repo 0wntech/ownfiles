@@ -10,12 +10,11 @@ const config = require('./podConfig.json');
 const podClient = new FileClient();
 
 describe('Update', function() {
-    this.timeout(config.timeOut);
     before('Setting up auth...', async function() {
         const credentials = await auth.getCredentials();
         await auth.login(credentials);
         podClient.fetcher = new rdf.Fetcher(podClient.graph, {
-            "fetch": auth.fetch,
+            fetch: auth.fetch,
         });
     });
 
@@ -31,7 +30,6 @@ describe('Update', function() {
             const content = config.updateTestContent + ' test';
             await podClient.update(config.updateTestFile, content);
             const file = await podClient.read(config.updateTestFile);
-            console.log(file);
             expect(file).to.equal(content);
         });
     });

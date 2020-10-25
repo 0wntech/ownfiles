@@ -43,7 +43,7 @@ export const renameFolder = function(
                         this.delete(resource)
                             .then(() => {
                                 console.log(
-                                    `DEBUG -- Successfully rename ${resource} to ${newName}`,
+                                    `DEBUG -- Successfully renamed ${resource} to ${newName}`,
                                 );
                                 resolve();
                             })
@@ -68,9 +68,9 @@ export const renameFile = function(
         const stringContent = content as string;
         const blobContent = content as Blob;
         const options: CreateOptions = {
-            "name": newName,
-            "contents": stringContent ?? blobContent ?? '',
-            "contentType":
+            name: newName,
+            contents: stringContent ?? blobContent ?? '',
+            contentType:
                 mime.getType(newName) ||
                 mime.getType(resource) ||
                 'text/turtle',

@@ -38,19 +38,32 @@ export const read = async function(
 ) {
     const store = this.graph;
     const fetcher = this.fetcher;
-
     store.removeDocument(rdf.sym(resource));
-    let response;
 
+    let fetch;
     if (options.auth) {
-        response = await options.auth.fetch(resource, {
-            headers: options.headers,
-        });
+        fetch = options.auth.fetch;
     } else {
-        response = await fetcher._fetch(resource, {
-            headers: options.headers,
-        });
+        fetch = fetcher._fetch;
     }
+    const headResponse = await fetch(resource, {
+        method: 'HEAD',
+    });
+    const isFolder =
+        headResponse &&
+        headResponse.headers
+            .get('Link')
+            ?.includes('http://www.w3.org/ns/ldp#Container');
+    resource = isFolder
+        ? resource.endsWith('/')
+            ? resource
+            : resource + '/'
+        : resource;
+
+    const response = await fetch(resource, {
+        headers: options.headers,
+    });
+
     const contentType = response.headers.get('Content-Type');
     if (
         contentType.includes('text') ||
@@ -60,8 +73,9 @@ export const read = async function(
         const text = await response.text();
         if (
             response.headers.get('Content-Type') === 'text/turtle' &&
-            isFolder(text, resource, store)
+            isFolder
         ) {
+            rdf.parse(text, store, resource);
             return parseResult(resource, store, options.verbose);
         } else {
             if (options.verbose) {
@@ -82,25 +96,10 @@ export const read = async function(
     }
 };
 
-const isFolder = (result: string, resource: string, store: any) => {
-    try {
-        if (result) {
-            rdf.parse(result, store, resource, 'text/turtle');
-        }
-        return store.holds(
-            rdf.sym(resource),
-            ns(rdf).rdf('type'),
-            ns(rdf).ldp('BasicContainer'),
-        );
-    } catch (err) {
-        return false;
-    }
-};
-
 const parseResult = (resource: string, store: any, verbose = false) => {
     const containments: FolderType = { folders: [], files: [] };
     store
-        .each(rdf.sym(resource), ns(rdf).ldp('contains'), undefined)
+        .each(rdf.sym(resource), ns(rdf).ldp('contains'), null)
         .map((result: { value: string }) => {
             return result.value;
         })

@@ -1,6 +1,16 @@
 import FileClient from './fileClient';
 import { FileType, FolderType } from './read';
 
+export interface FileIndexEntry {
+    url: string;
+    type: string;
+}
+
+export interface FolderIndexEntry {
+    url: string;
+    types: string[];
+}
+
 export const deepRead = async function(
     this: FileClient,
     folderUrl: string,
@@ -52,7 +62,7 @@ export const deepRead = async function(
                 ? [{ url: folderUrl, type: 'folder' }]
                 : [folderUrl],
         )
-        .then(function(results: any[]) {
+        .then((results): ({ url: string; type: string } | string)[] => {
             return flattenArray(results)
                 .sort((fileA: string, fileB: string) =>
                     sortByDepth(fileA, fileB, !!options.verbose),
@@ -60,10 +70,45 @@ export const deepRead = async function(
                 .reverse();
         });
 
+    if (options.verbose) {
+        const verboseDeepRead = (deepRead as {
+            url: string;
+            type: string;
+        }[]).map((resource, _, deepRead) => {
+            return resource.type && resource.type === 'folder'
+                ? {
+                      url: resource.url,
+                      types: getContainedTypes(resource, deepRead),
+                  }
+                : resource;
+        });
+
+        return verboseDeepRead;
+    }
+
     return deepRead;
 };
 
-function flattenArray(array: any[]): string[] {
+const getContainedTypes = (item, index) => {
+    return index
+        .reduce(
+            (allTypes: string[], currentItem: { url: string; type: string }) =>
+                currentItem.url.includes(item.url) &&
+                currentItem.type &&
+                currentItem.type !== null &&
+                currentItem.type !== 'folder'
+                    ? [...allTypes, currentItem.type]
+                    : allTypes,
+            [],
+        )
+        .filter(
+            (currentType: string, index: number, allNodes: string[]) =>
+                allNodes.findIndex((type: string) => currentType === type) ===
+                index,
+        );
+};
+
+function flattenArray(array): string[] {
     let result: string[] = [];
     for (let i = 0; i < array.length; i++) {
         const element = array[i];
@@ -92,5 +137,9 @@ function sortByDepth(
         depthB = fileB.split('/').length;
     }
 
-    return depthA - depthB;
+    if (depthA === depthB) {
+        return (fileA as string).length - (fileB as string).length;
+    } else {
+        return depthA - depthB;
+    }
 }

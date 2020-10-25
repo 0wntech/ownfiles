@@ -1,175 +1,58 @@
 {
-    "podUrl": "https://lalasepp1.solidcommunity.net/",
-    "testFile": "https://lalasepp1.solidcommunity.net/test.ttl",
-    "testFolder": "https://lalasepp1.solidcommunity.net/test/",
-    "podContents": {
+    "podUrl": "https://lalatest.solidcommunity.net/",
+    "testFile": "https://lalatest.solidcommunity.net/test.ttl",
+    "testFolder": "https://lalatest.solidcommunity.net/test/",
+    "podContents": [
+        "https://lalatest.solidcommunity.net/settings/prefs.ttl",
+        "https://lalatest.solidcommunity.net/settings/privateTypeIndex.ttl",
+        "https://lalatest.solidcommunity.net/settings/publicTypeIndex.ttl",
+        "https://lalatest.solidcommunity.net/settings/serverSide.ttl.inactive",
+        "https://lalatest.solidcommunity.net/settings/fileIndex.ttl",
+        "https://lalatest.solidcommunity.net/settings/",
+        "https://lalatest.solidcommunity.net/public/",
+        "https://lalatest.solidcommunity.net/profile/card",
+        "https://lalatest.solidcommunity.net/profile/",
+        "https://lalatest.solidcommunity.net/private/",
+        "https://lalatest.solidcommunity.net/inbox/",
+        "https://lalatest.solidcommunity.net/.well-known/",
+        "https://lalatest.solidcommunity.net/",
+        "https://lalatest.solidcommunity.net/robots.txt",
+        "https://lalatest.solidcommunity.net/favicon.ico"
+    ],
+    "folder": {
         "folders": [
-            "https://lalasepp1.solidcommunity.net/.well-known/",
-            "https://lalasepp1.solidcommunity.net/inbox/",
-            "https://lalasepp1.solidcommunity.net/private/",
-            "https://lalasepp1.solidcommunity.net/profile/",
-            "https://lalasepp1.solidcommunity.net/settings/"
+            "https://lalatest.solidcommunity.net/.well-known/",
+            "https://lalatest.solidcommunity.net/inbox/",
+            "https://lalatest.solidcommunity.net/private/",
+            "https://lalatest.solidcommunity.net/profile/",
+            "https://lalatest.solidcommunity.net/public/",
+            "https://lalatest.solidcommunity.net/settings/"
         ],
         "files": [
-            "https://lalasepp1.solidcommunity.net/favicon.ico",
-            "https://lalasepp1.solidcommunity.net/robots.txt"
+            "https://lalatest.solidcommunity.net/favicon.ico",
+            "https://lalatest.solidcommunity.net/robots.txt"
         ]
     },
     "verboseFolder": {
         "folders": [],
         "files": [
             {
-                "name": "https://lalasepp1.solidcommunity.net/profile/card",
+                "name": "https://lalatest.solidcommunity.net/profile/card",
                 "type": "text/turtle"
             }
         ]
     },
     "fileIndex": [
         {
-            "url": "https://lalasepp1.solidcommunity.net/settings/fileIndex.ttl",
+            "url": "https://lalatest.solidcommunity.net/profile/card",
             "types": ["text/turtle"]
         },
         {
-            "url": "https://lalasepp1.solidcommunity.net/settings/prefs.ttl",
+            "url": "https://lalatest.solidcommunity.net/profile",
             "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/privateTypeIndex.ttl",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/publicTypeIndex.ttl",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/serverSide.ttl.inactive",
-            "types": ["text/plain"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/",
-            "types": ["text/turtle", "text/plain"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/profile/card",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/profile/",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/private/aa.jpeg",
-            "types": ["image/jpeg"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/private/",
-            "types": ["image/jpeg"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/inbox/19b96790-f120-11ea-9e0e-03acd6b5cc49.ttl",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/inbox/malte18",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/inbox/",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/.well-known/",
-            "types": []
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/",
-            "types": [
-                "text/turtle",
-                "text/plain",
-                "image/jpeg",
-                "image/vnd.microsoft.icon"
-            ]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/robots.txt",
-            "types": ["text/plain"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/favicon.ico",
-            "types": ["image/vnd.microsoft.icon"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/",
-            "types": [
-                "image/jpeg",
-                "image/vnd.microsoft.icon",
-                "text/plain",
-                "text/turtle"
-            ]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/private/aa.jpeg",
-            "types": ["image/jpeg"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/private/",
-            "types": ["image/jpeg"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/favicon.ico",
-            "types": ["image/vnd.microsoft.icon"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/",
-            "types": ["text/plain", "text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/robots.txt",
-            "types": ["text/plain"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/serverSide.ttl.inactive",
-            "types": ["text/plain"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/inbox/19b96790-f120-11ea-9e0e-03acd6b5cc49.ttl",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/inbox/malte18",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/profile/card",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/fileIndex.ttl",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/prefs.ttl",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/privateTypeIndex.ttl",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/settings/publicTypeIndex.ttl",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/inbox/",
-            "types": ["text/turtle"]
-        },
-        {
-            "url": "https://lalasepp1.solidcommunity.net/profile/",
-            "types": ["text/turtle"]
-        },
-        { "url": "https://lalasepp1.solidcommunity.net/.well-known/", "types": [] }
+        }
     ],
-    "updateTestFile": "https://lalasepp1.solidcommunity.net/robots.txt",
+    "updateTestFile": "https://lalatest.solidcommunity.net/robots.txt",
     "updateTestContent": "User-agent: *\n# Allow all crawling (subject to ACLs as usual, of course)\nDisallow:",
-    "timeOut": 20000
+    "timeOut": 30000
 }

@@ -6,7 +6,6 @@ const config = require('./podConfig.json');
 const podClient = new FileClient();
 
 describe('Read', function() {
-    this.timeout(config.timeOut);
     before('Setting up auth...', async function() {
         await cleanUp(podClient);
     });
@@ -14,12 +13,12 @@ describe('Read', function() {
     describe('read()', function() {
         it('should read the specified folder', async function() {
             const folder = await podClient.read(config.podUrl);
-            expect(folder).to.deep.equal(config.podContents);
+            expect(folder).to.deep.equal(config.folder);
         });
 
         it('should read the specified folder and types', async function() {
             const folder = await podClient.read(config.podUrl + 'profile/', {
-                "verbose": true,
+                verbose: true,
             });
             expect(folder).to.deep.equal(config.verboseFolder);
         });
@@ -27,8 +26,8 @@ describe('Read', function() {
         it('should read the contents of the specified file', async function() {
             const content = 'Hello I am a text file.';
             await podClient.create(config.testFile, {
-                "contentType": 'text/plain',
-                "contents": content,
+                contentType: 'text/plain',
+                contents: content,
             });
             const file = await podClient.read(
                 config.testFile.replace('ttl', 'txt'),

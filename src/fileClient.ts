@@ -5,13 +5,14 @@ import {
     createFolder,
     createIfNotExist,
     CreateOptions,
+    ExtendedResponseType,
 } from './create';
 import { FolderType, read, ReadOptions, SingleFileType } from './read';
 import { copy, copyFile, copyFolder } from './copy';
 import { update } from './update';
 import { renameFile, renameFolder } from './rename';
 import * as deleting from './delete';
-import { deepRead } from './deepRead';
+import { deepRead, FileIndexEntry, FolderIndexEntry } from './deepRead';
 import {
     createIndex,
     readIndex,
@@ -19,13 +20,13 @@ import {
     addToIndex,
     deleteFromIndex,
     updateIndexFor,
-    IndexType,
 } from './indexing';
 
 export default class FileClient {
     graph: rdf.IndexedFormula;
     fetcher: rdf.Fetcher;
     updater: rdf.UpdateManager;
+    indexPath: string;
     create: (
         this: FileClient,
         resourceAddress: string,
@@ -69,8 +70,11 @@ export default class FileClient {
     delete: (
         this: FileClient,
         resources: string | string[],
-    ) => Promise<unknown>;
-    deleteRecursively: (this: FileClient, resource: string) => Promise<unknown>;
+    ) => Promise<ExtendedResponseType | ExtendedResponseType[]>;
+    deleteRecursively: (
+        this: FileClient,
+        resource: string,
+    ) => Promise<ExtendedResponseType>;
     update: (
         this: FileClient,
         resource: string,
@@ -81,16 +85,16 @@ export default class FileClient {
         this: FileClient,
         folderUrl: string,
         options?: Partial<{ auth: any; verbose: boolean }>,
-    ) => Promise<({ url: string; type: string } | string)[]>;
+    ) => Promise<(FileIndexEntry | FolderIndexEntry | string)[]>;
     createIndex: (
         this: FileClient,
         user: string,
-    ) => Promise<IndexType[] | undefined>;
+    ) => Promise<(FileIndexEntry | FolderIndexEntry)[] | undefined>;
     deleteIndex: (this: FileClient, user: string) => Promise<unknown>;
     readIndex: (
         this: FileClient,
         user: string,
-    ) => Promise<IndexType[] | undefined>;
+    ) => Promise<(FileIndexEntry | FolderIndexEntry)[] | undefined>;
     addToIndex: (this: FileClient, item: string) => Promise<void[]>;
     deleteFromIndex: (this: FileClient, item: string) => Promise<void[]>;
     updateIndexFor: (this: FileClient, item: string) => Promise<void>;
@@ -105,10 +109,15 @@ export default class FileClient {
         location: string,
     ) => Promise<void>;
 
-    constructor() {
+    constructor(
+        { indexPath }: { indexPath: string } = {
+            indexPath: 'settings/fileIndex.ttl',
+        },
+    ) {
         this.graph = rdf.graph();
         this.fetcher = new rdf.Fetcher(this.graph);
         this.updater = new rdf.UpdateManager(this.graph);
+        this.indexPath = indexPath;
         this.create = create;
         this.createFile = createFile;
         this.createFolder = createFolder;

@@ -1,11 +1,11 @@
 {
     "name": "ownfiles",
-    "version": "1.2.42",
+    "version": "1.2.43",
     "description": "A library to manage files in a Solid User's Pod",
     "main": "lib/index.js",
     "scripts": {
-        "build": "rm -rf lib && tsc",
-        "test": "npm run build && mocha -r ts-node/register --timeout=20000 test/*.test.ts",
+        "build": "tsc",
+        "test": "npm run build && mocha -r ts-node/register --timeout=30000 test/*.test.ts",
         "lint": "eslint src/* test/*"
     },
     "repository": {

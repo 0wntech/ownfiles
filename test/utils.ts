@@ -10,21 +10,22 @@ export const cleanUp = (podClient: FileClient): Promise<void> => {
         const credentials = await auth.getCredentials();
         await auth.login(credentials);
         podClient.fetcher = new rdf.Fetcher(podClient.graph, {
-            "fetch": auth.fetch,
+            fetch: auth.fetch,
         });
-        const folder = (await podClient.read(config.podUrl)) as FolderType;
+        const pod = (await podClient.read(config.podUrl)) as FolderType;
         const cleanUps: Promise<unknown>[] = [];
-        folder.folders.forEach((element: string) => {
-            if (!config.podContents.folders.includes(element)) {
+        pod.folders.forEach((element: string) => {
+            if (!config.folder.folders.includes(element)) {
                 cleanUps.push(podClient.delete(element));
             }
         });
-        folder.files.forEach((element) => {
+        pod.files.forEach((element) => {
             element = element as string;
-            if (!config.podContents.files.includes(element)) {
+            if (element && !config.folder.files.includes(element)) {
                 cleanUps.push(podClient.delete(element));
             }
         });
+
         await Promise.all(cleanUps)
             .then(() => {
                 resolve();

@@ -9,7 +9,6 @@ const ns = require('solid-namespace');
 const podClient = new FileClient();
 
 describe('Create', function() {
-    this.timeout(config.timeOut);
     before('Setting up auth...', async function() {
         await cleanUp(podClient);
     });
@@ -18,6 +17,14 @@ describe('Create', function() {
         it('should create a folder at the specified url', async function() {
             const res = await podClient.create(config.testFolder);
             expect(res.status).to.equal(201);
+        });
+
+        it('should create an index entry for a created folder', async function() {
+            const index = await podClient.readIndex(config.podUrl);
+            const indexEntry = index?.find(
+                (entry) => entry.url === config.testFolder,
+            );
+            expect(indexEntry?.url).to.equal(config.testFolder);
         });
 
         it('should not create a folder if there is an invalid url and throw an error instead', function() {
@@ -31,9 +38,7 @@ describe('Create', function() {
         it('should create a turtle file at the specified url with the turtle contents', async function() {
             const contents = [
                 rdf.st(
-                    rdf.sym(
-                        'https://lalasepp1.solid.community/profile/card#me',
-                    ),
+                    rdf.sym('https://lalatest.solid.community/profile/card#me'),
                     ns(rdf).foaf('knows'),
                     rdf.sym('https://ludwig.owntech.de/profile/card#me'),
                     rdf.sym(config.testFile),
@@ -49,12 +54,20 @@ describe('Create', function() {
                     return fetcher.load(config.testFile).then(() => {
                         const testTriples = store.statementsMatching(
                             rdf.sym(
-                                'https://lalasepp1.solid.community/profile/card#me',
+                                'https://lalatest.solid.community/profile/card#me',
                             ),
                         );
                         expect(testTriples).to.deep.equal(contents);
                     });
                 });
+        });
+
+        it('should create an index entry for a created file', async function() {
+            const index = await podClient.readIndex(config.podUrl);
+            const indexEntry = index?.find(
+                (entry) => entry.url === config.testFile,
+            );
+            expect(indexEntry?.url).to.equal(config.testFile);
         });
 
         it('should create a plaintext file at the specified url with the contents', async function() {
