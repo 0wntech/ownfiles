@@ -100,7 +100,15 @@ export default class FileClient {
     addToIndex: (
         this: FileClient,
         item: FileIndexEntry | FolderIndexEntry | string,
-        options?: { force?: boolean },
+        options?: {
+            force?: boolean;
+            updateCallback?: (
+                uri: string | undefined | null,
+                success: boolean,
+                errorBody?: string,
+                response?: Response | Error,
+            ) => void;
+        },
     ) => Promise<void>;
     deleteFromIndex: (this: FileClient, item: string) => Promise<void[]>;
     copyFile: (

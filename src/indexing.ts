@@ -128,7 +128,18 @@ export const deleteFromIndex = async function(this: FileClient, item: string) {
 export const addToIndex = async function(
     this: FileClient,
     item: FileIndexEntry | FolderIndexEntry | string,
-    { force }: { force?: boolean } = {},
+    {
+        force,
+        updateCallback,
+    }: {
+        force?: boolean;
+        updateCallback?: (
+            uri: string | undefined | null,
+            success: boolean,
+            errorBody?: string,
+            response?: Response | Error,
+        ) => void;
+    } = {},
 ) {
     const parsedItemUrl =
         typeof item === 'string'
@@ -161,11 +172,16 @@ export const addToIndex = async function(
         this.graph,
         indexUrl,
     );
-    return await this.updater.update(del, ins, (_, ok, err) => {
-        if (!ok) {
-            console.log(err);
-        }
-    });
+    return await this.updater.update(
+        del,
+        ins,
+        updateCallback ??
+            ((_, ok, err) => {
+                if (!ok) {
+                    console.log(err);
+                }
+            }),
+    );
 };
 
 const getNewIndexTriples = (
