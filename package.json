@@ -1,6 +1,6 @@
 {
     "name": "ownfiles",
-    "version": "1.2.51",
+    "version": "1.2.52",
     "description": "A library to manage files in a Solid User's Pod",
     "main": "lib/index.js",
     "scripts": {
