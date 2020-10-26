@@ -47,17 +47,19 @@ export const readIndex = async function(this: FileClient, url: string) {
     const parsedUrl = urlUtils.parse(url);
     const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
-    try {
-        const res = (await this.read(indexUrl)) as string;
-        rdf.parse(res, this.graph, indexUrl);
-        return readIndexTriples(indexUrl, this.graph);
-    } catch (err) {
-        if (err?.status === 404) {
-            return [];
-        } else {
-            throw err;
-        }
-    }
+    return this.read(indexUrl)
+        .then((indexFile) => {
+            indexFile = indexFile as string;
+            rdf.parse(indexFile, this.graph, indexUrl);
+            return readIndexTriples(indexUrl, this.graph);
+        })
+        .catch((err) => {
+            if (err?.status === 404) {
+                return [];
+            } else {
+                throw err;
+            }
+        });
 };
 
 const readIndexTriples = (indexUrl: string, graph: any) => {
