@@ -19,7 +19,6 @@ import {
     deleteIndex,
     addToIndex,
     deleteFromIndex,
-    updateIndexFor,
     IndexType,
 } from './indexing';
 
@@ -28,6 +27,7 @@ export default class FileClient {
     fetcher: rdf.Fetcher;
     updater: rdf.UpdateManager;
     indexPath: string;
+    indexURI?: string;
     create: (
         this: FileClient,
         resourceAddress: string,
@@ -101,9 +101,8 @@ export default class FileClient {
         this: FileClient,
         item: FileIndexEntry | FolderIndexEntry | string,
         options?: { force?: boolean },
-    ) => Promise<void[]>;
+    ) => Promise<void>;
     deleteFromIndex: (this: FileClient, item: string) => Promise<void[]>;
-    updateIndexFor: (this: FileClient, item: string) => Promise<void>;
     copyFile: (
         this: FileClient,
         resource: string,
@@ -141,7 +140,6 @@ export default class FileClient {
         this.readIndex = readIndex;
         this.addToIndex = addToIndex;
         this.deleteFromIndex = deleteFromIndex;
-        this.updateIndexFor = updateIndexFor;
         this.copyFile = copyFile;
         this.copyFolder = copyFolder;
     }

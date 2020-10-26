@@ -76,9 +76,11 @@ export const createFolder = async function(
     if (location && res.status < 304) {
         const parsedUrl = url.parse(folderAddress);
         const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
-        await this.addToIndex(rootUrl + location);
+        await this.addToIndex(
+            { url: rootUrl + location, types: [] },
+            { force: true },
+        );
     }
-
     return res;
 };
 
@@ -119,10 +121,12 @@ export const createFile = async function(
     if (location && res.status < 300) {
         const parsedUrl = url.parse(fileAddress);
         const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
-        await this.addToIndex(rootUrl + location);
+        await this.addToIndex({
+            url: rootUrl + location,
+            type: options.contentType ?? 'text/plain',
+        });
     }
-
-    return res;
+    return await res;
 };
 
 export const createIfNotExist = function(

@@ -78,7 +78,7 @@ export const read = async function(
             isFolder
         ) {
             rdf.parse(text, store, resource);
-            return parseResult(resource, store, options.verbose);
+            return parseFolderResult(resource, store, options.verbose);
         } else {
             if (options.verbose) {
                 return { body: text, contentType: contentType };
@@ -98,7 +98,11 @@ export const read = async function(
     }
 };
 
-const parseResult = (resource: string, store: any, verbose = false) => {
+export const parseFolderResult = (
+    resource: string,
+    store: any,
+    verbose = false,
+) => {
     const containments: FolderType = { folders: [], files: [] };
     store
         .each(rdf.sym(resource), ns(rdf).ldp('contains'), null)

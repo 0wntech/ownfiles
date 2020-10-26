@@ -44,11 +44,11 @@
     },
     "fileIndex": [
         {
-            "url": "https://lalatest.solidcommunity.net/profile/card",
+            "url": "https://lalatest.solidcommunity.net/profile",
             "types": ["text/turtle"]
         },
         {
-            "url": "https://lalatest.solidcommunity.net/profile",
+            "url": "https://lalatest.solidcommunity.net/profile/card",
             "types": ["text/turtle"]
         }
     ],

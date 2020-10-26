@@ -17,6 +17,7 @@ export const createIndex = async function(
     const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
     await this.createIfNotExist(indexUrl);
+    this.indexURI = indexUrl;
     items =
         (items as (FileIndexEntry | FolderIndexEntry)[]) ??
         ((await this.deepRead(url, { verbose: true })) as (
@@ -24,9 +25,16 @@ export const createIndex = async function(
             | FolderIndexEntry
         )[]);
 
-    const [del, ins] = getNewIndexTriples(items, this.graph, indexUrl);
+    const ins = getNewIndexTriples(items, this.graph, indexUrl)[1];
 
-    await this.updater.update(del, ins);
+    await this.updater.put(
+        rdf.sym(indexUrl),
+        ins,
+        'text/turtle',
+        (_, ok, error) => {
+            if (!ok) throw error;
+        },
+    );
     return this.readIndex(indexUrl);
 };
 
@@ -34,32 +42,25 @@ export const deleteIndex = async function(this: FileClient, url: string) {
     const parsedUrl = urlUtils.parse(url);
     const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
-    return this.delete(indexUrl).catch((err) => {
-        if (err.response.status === 404) {
-            return;
-        } else {
-            throw err;
-        }
-    });
-};
-
-export const readIndex = async function(this: FileClient, url: string) {
-    const parsedUrl = urlUtils.parse(url);
-    const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
-    const indexUrl = rootUrl + this.indexPath;
-    return this.read(indexUrl)
-        .then((indexFile) => {
-            indexFile = indexFile as string;
-            rdf.parse(indexFile, this.graph, indexUrl);
-            return readIndexTriples(indexUrl, this.graph);
-        })
+    return this.delete(indexUrl)
+        .then(() => (this.indexURI = undefined))
         .catch((err) => {
-            if (err?.status === 404) {
-                return [];
+            if (err.response.status === 404) {
+                return;
             } else {
                 throw err;
             }
         });
+};
+
+export const readIndex = function(this: FileClient, url: string) {
+    const parsedUrl = urlUtils.parse(url);
+    const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
+    const indexUrl = rootUrl + this.indexPath;
+    return this.fetcher.load(indexUrl, { clearPreviousData: true }).then(() => {
+        const index = readIndexTriples(indexUrl, this.graph);
+        return index ?? [];
+    });
 };
 
 const readIndexTriples = (indexUrl: string, graph: any) => {
@@ -68,19 +69,24 @@ const readIndexTriples = (indexUrl: string, graph: any) => {
     }
     const index: (FileIndexEntry | FolderIndexEntry)[] = [];
     graph
-        .each(null, ns.rdf('type'), ns.solid('TypeRegistration'))
-        .forEach((indexNode: { value: string }) => {
-            const urlNode =
-                graph.any(indexNode, ns.solid('instance')) ||
-                graph.any(indexNode, ns.solid('instanceContainer'));
-            const nodeTypes = graph
-                .statementsMatching(indexNode, ns.solid('forClass'))
+        .statementsMatching(
+            null,
+            ns.rdf('type'),
+            ns.solid('TypeRegistration'),
+            rdf.sym(indexUrl),
+        )
+        .forEach(({ subject }: { subject: { value: string } }) => {
+            const instanceNode =
+                graph.any(subject, ns.solid('instance')) ||
+                graph.any(subject, ns.solid('instanceContainer'));
+            const typeNodes = graph
+                .statementsMatching(subject, ns.solid('forClass'))
                 .map((statement: { object: { value: string } }) =>
                     statement.object.value
                         .replace(typeNamespaceUrl, '')
                         .replace('#Resource', ''),
                 ) as string[];
-            index.push({ url: urlNode.value, types: nodeTypes });
+            index.push({ url: instanceNode.value, types: typeNodes });
         });
 
     return index;
@@ -136,9 +142,12 @@ export const addToIndex = async function(
                   verbose: true,
               })) as (FileIndexEntry | FolderIndexEntry)[])
             : ([item] as (FileIndexEntry | FolderIndexEntry)[]);
-    await this.createIfNotExist(indexUrl);
-    const index = (!force && (await this.readIndex(rootUrl))) as IndexType;
-    const itemsToUpdate = index?.reduce(
+    if (!this.indexURI) {
+        const res = await this.createIfNotExist(indexUrl);
+        this.indexURI = res?.headers.get('Location') ?? indexUrl;
+    }
+    const index = !force ? ((await this.readIndex(rootUrl)) as IndexType) : [];
+    const itemsToUpdate = index.reduce(
         (itemsToUpdate: (FileIndexEntry | FolderIndexEntry)[], entry) => {
             const entryUrl = urlUtils.parse(entry.url);
             return parsedItemUrl.pathname?.includes(entryUrl.pathname as string)
@@ -147,21 +156,16 @@ export const addToIndex = async function(
         },
         [],
     );
-    return await Promise.all(
-        [...(itemsToUpdate ?? []), ...itemsToAdd].map((item) => {
-            const [del, ins] = getNewIndexTriples([item], this.graph, indexUrl);
-            return this.updater.update(del, ins, (_, ok, err) => {
-                if (!ok) {
-                    console.log(err);
-                }
-            });
-        }),
+    const [del, ins] = getNewIndexTriples(
+        [...(itemsToUpdate ?? []), ...itemsToAdd],
+        this.graph,
+        indexUrl,
     );
-};
-
-export const updateIndexFor = async function(this: FileClient, item: string) {
-    await this.deleteFromIndex(item);
-    await this.addToIndex(item);
+    return await this.updater.update(del, ins, (_, ok, err) => {
+        if (!ok) {
+            console.log(err);
+        }
+    });
 };
 
 const getNewIndexTriples = (
@@ -185,7 +189,9 @@ const getNewIndexTriples = (
                 );
 
                 if (!rootNode) {
-                    rootNode = new rdf.BlankNode();
+                    rootNode = new rdf.BlankNode(
+                        String(Math.floor(Math.random() * 100000000)),
+                    );
                     ins.push(
                         rdf.st(
                             rootNode,
@@ -266,7 +272,9 @@ const getNewIndexTriples = (
                 );
 
                 if (!rootNode) {
-                    rootNode = new rdf.BlankNode();
+                    rootNode = new rdf.BlankNode(
+                        String(Math.floor(Math.random() * 100000000)),
+                    );
                     ins.push(
                         rdf.st(
                             rootNode,
