@@ -122,7 +122,7 @@ export const createFile = async function(
         const parsedUrl = url.parse(fileAddress);
         const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
         await this.addToIndex({
-            url: rootUrl + location,
+            url: rootUrl + location ?? fileAddress,
             type: options.contentType ?? 'text/plain',
         });
     }
