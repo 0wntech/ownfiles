@@ -62,6 +62,8 @@ export const read = async function(
 
     const response = await fetch(resource, {
         headers: options.headers,
+    }).catch((err) => {
+        throw err;
     });
 
     const contentType = response.headers.get('Content-Type');
