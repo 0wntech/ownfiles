@@ -147,7 +147,9 @@ export const parseFolderResult = (
                 resultFragments &&
                 resultFragments[resultFragments.length - 1] === ''
             ) {
-                containments.folders.push(result);
+                containments.folders.push(
+                    result.endsWith('/') ? result : result + '/',
+                );
             } else {
                 if (verbose) {
                     containments.files.push({
