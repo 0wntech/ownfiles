@@ -7,6 +7,7 @@ import ns from 'solid-namespace';
 export interface ReadOptions {
     auth: any;
     verbose: boolean;
+    headOnly: boolean;
     headers: Record<string, string>;
 }
 
@@ -28,9 +29,10 @@ export interface SingleFileType {
 export const read = async function(
     this: FileClient,
     resource: string,
-    options: Partial<ReadOptions> = {
+    { auth, verbose, headOnly, headers }: Partial<ReadOptions> = {
         auth: false,
         verbose: false,
+        headOnly: false,
         headers: {
             Accept: mime.getType(resource) ?? 'text/turtle',
         },
@@ -41,8 +43,8 @@ export const read = async function(
     store.removeDocument(rdf.sym(resource));
 
     let fetch;
-    if (options.auth) {
-        fetch = options.auth.fetch;
+    if (auth) {
+        fetch = auth.fetch;
     } else {
         fetch = fetcher._fetch;
     }
@@ -54,6 +56,16 @@ export const read = async function(
         headResponse.headers
             .get('Link')
             ?.includes('http://www.w3.org/ns/ldp#Container');
+    if (!isFolder && headOnly) {
+        return Promise.resolve(
+            verbose
+                ? {
+                      name: resource,
+                      type: headResponse.headers.get('Content-Type'),
+                  }
+                : resource,
+        );
+    }
     resource = isFolder
         ? resource.endsWith('/')
             ? resource
@@ -61,7 +73,7 @@ export const read = async function(
         : resource;
 
     const response = await fetch(resource, {
-        headers: options.headers,
+        headers: headers,
     }).catch((err) => {
         throw err;
     });
@@ -78,9 +90,9 @@ export const read = async function(
             isFolder
         ) {
             rdf.parse(text, store, resource);
-            return parseFolderResult(resource, store, options.verbose);
+            return parseFolderResult(resource, store, verbose);
         } else {
-            if (options.verbose) {
+            if (verbose) {
                 return { body: text, contentType: contentType };
             } else {
                 return text;
@@ -90,7 +102,7 @@ export const read = async function(
         const body = response.blob
             ? await response.blob()
             : await response.buffer();
-        if (options.verbose) {
+        if (verbose) {
             return { body: body, contentType: contentType };
         } else {
             return body;

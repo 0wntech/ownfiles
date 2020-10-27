@@ -118,7 +118,7 @@ export const createFile = async function(
 
     const res = await this.fetcher.webOperation('PUT', fileAddress, request);
     const location =
-        res.headers.get('Location') || url.parse(fileAddress).pathname;
+        res.headers.get('Location') ?? url.parse(fileAddress).pathname;
     if (location && res.status < 300) {
         const parsedUrl = url.parse(fileAddress);
         const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;

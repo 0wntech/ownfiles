@@ -1,4 +1,5 @@
 import * as urlUtils from 'url';
+import cuid from 'cuid';
 import FileClient from './index';
 import * as rdf from 'rdflib';
 import { FileIndexEntry, FolderIndexEntry } from './deepRead';
@@ -205,9 +206,7 @@ const getNewIndexTriples = (
                 );
 
                 if (!rootNode) {
-                    rootNode = new rdf.BlankNode(
-                        String(Math.floor(Math.random() * 100000000)),
-                    );
+                    rootNode = new rdf.BlankNode(cuid());
                     ins.push(
                         rdf.st(
                             rootNode,
@@ -288,9 +287,7 @@ const getNewIndexTriples = (
                 );
 
                 if (!rootNode) {
-                    rootNode = new rdf.BlankNode(
-                        String(Math.floor(Math.random() * 100000000)),
-                    );
+                    rootNode = new rdf.BlankNode(cuid());
                     ins.push(
                         rdf.st(
                             rootNode,

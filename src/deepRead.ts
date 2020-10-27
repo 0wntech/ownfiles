@@ -21,6 +21,7 @@ export const deepRead = async function(
 ) {
     const deepRead = await this.read(folderUrl, {
         verbose: true,
+        headOnly: true,
         headers: { Accept: 'text/turtle' },
     })
         .then((folder) => {
