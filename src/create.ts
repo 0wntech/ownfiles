@@ -151,6 +151,10 @@ export const createIfNotExist = function(
             } else {
                 return this.create(resourceAddress, options);
             }
+        })
+        .catch((err) => {
+            if (err.response.status === 404)
+                return this.create(resourceAddress, options);
         });
 };
 
