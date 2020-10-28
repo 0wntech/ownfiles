@@ -13,7 +13,7 @@ describe('Indexing', function() {
         await podClient.deleteIndex(config.podUrl);
     });
 
-    describe.only('indexing()', async function() {
+    describe('indexing()', async function() {
         it('should index a folder at the specified url', async function() {
             const index = await podClient.createIndex(
                 config.podUrl + 'profile',
