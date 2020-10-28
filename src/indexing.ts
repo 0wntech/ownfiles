@@ -2,12 +2,10 @@ import * as urlUtils from 'url';
 import cuid from 'cuid';
 import FileClient from './index';
 import * as rdf from 'rdflib';
-import { FileIndexEntry, FolderIndexEntry } from './deepRead';
+import { IndexEntry } from './deepRead';
 const ns = require('solid-namespace')(rdf);
-const typeNamespaceUrl = 'http://www.w3.org/ns/iana/media-types/';
-const types = rdf.Namespace(typeNamespaceUrl);
 
-export type IndexType = (FileIndexEntry | FolderIndexEntry)[];
+export type IndexType = IndexEntry[];
 
 export const createIndex = async function(
     this: FileClient,
@@ -20,13 +18,10 @@ export const createIndex = async function(
     await this.createIfNotExist(indexUrl);
     this.indexURI = indexUrl;
     items =
-        (items as (FileIndexEntry | FolderIndexEntry)[]) ??
-        ((await this.deepRead(url, { verbose: true })) as (
-            | FileIndexEntry
-            | FolderIndexEntry
-        )[]);
+        (items as IndexEntry[]) ??
+        ((await this.deepRead(url, { verbose: true })) as IndexEntry[]);
 
-    const ins = getNewIndexTriples(items, this.graph, indexUrl)[1];
+    const { ins } = getNewIndexTriples(items, this.graph, indexUrl);
 
     await this.updater.put(
         rdf.sym(indexUrl),
@@ -58,17 +53,14 @@ export const readIndex = function(this: FileClient, url: string) {
     const parsedUrl = urlUtils.parse(url);
     const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
-    return this.fetcher.load(indexUrl, { clearPreviousData: true }).then(() => {
+    return this.fetcher.load(indexUrl).then(() => {
         const index = readIndexTriples(indexUrl, this.graph);
-        return index ?? [];
+        return index;
     });
 };
 
 const readIndexTriples = (indexUrl: string, graph: any) => {
-    if (!graph.any(null, null, null, rdf.sym(indexUrl))) {
-        return;
-    }
-    const index: (FileIndexEntry | FolderIndexEntry)[] = [];
+    const index: IndexEntry[] = [];
     graph
         .statementsMatching(
             null,
@@ -77,17 +69,33 @@ const readIndexTriples = (indexUrl: string, graph: any) => {
             rdf.sym(indexUrl),
         )
         .forEach(({ subject }: { subject: { value: string } }) => {
-            const instanceNode =
-                graph.any(subject, ns.solid('instance')) ||
-                graph.any(subject, ns.solid('instanceContainer'));
+            const instanceStatement = ((graph.any(
+                subject,
+                ns.solid('instance'),
+            ) &&
+                graph.statementsMatching(subject, ns.solid('instance'))) ??
+                (graph.any(subject, ns.solid('instanceContainer')) &&
+                    graph.statementsMatching(
+                        subject,
+                        ns.solid('instanceContainer'),
+                    )))[0];
             const typeNodes = graph
                 .statementsMatching(subject, ns.solid('forClass'))
-                .map((statement: { object: { value: string } }) =>
-                    statement.object.value
-                        .replace(typeNamespaceUrl, '')
-                        .replace('#Resource', ''),
+                .map(
+                    (statement: { object: { value: string } }) =>
+                        statement.object.value,
                 ) as string[];
-            index.push({ url: instanceNode.value, types: typeNodes });
+            index.push(
+                instanceStatement.predicate.value === ns.solid('instance')
+                    ? {
+                          url: instanceStatement.object.value,
+                          types: typeNodes,
+                      }
+                    : {
+                          url: instanceStatement.object.value,
+                          types: typeNodes,
+                      },
+            );
         });
 
     return index;
@@ -128,7 +136,7 @@ export const deleteFromIndex = async function(this: FileClient, item: string) {
 
 export const addToIndex = async function(
     this: FileClient,
-    item: FileIndexEntry | FolderIndexEntry | string,
+    item: IndexEntry | string,
     {
         force,
         updateCallback,
@@ -152,23 +160,20 @@ export const addToIndex = async function(
         !force && typeof item === 'string'
             ? ((await this.deepRead(item, {
                   verbose: true,
-              })) as (FileIndexEntry | FolderIndexEntry)[])
-            : ([item] as (FileIndexEntry | FolderIndexEntry)[]);
+              })) as IndexEntry[])
+            : ([item] as IndexEntry[]);
     if (!this.indexURI) {
         const res = await this.createIfNotExist(indexUrl);
         this.indexURI = res?.headers.get('Location') ?? indexUrl;
     }
     const index = !force ? ((await this.readIndex(rootUrl)) as IndexType) : [];
-    const itemsToUpdate = index.reduce(
-        (itemsToUpdate: (FileIndexEntry | FolderIndexEntry)[], entry) => {
-            const entryUrl = urlUtils.parse(entry.url);
-            return parsedItemUrl.pathname?.includes(entryUrl.pathname as string)
-                ? [...itemsToUpdate, entry]
-                : itemsToUpdate;
-        },
-        [],
-    );
-    const [del, ins] = getNewIndexTriples(
+    const itemsToUpdate = index.reduce((itemsToUpdate: IndexEntry[], entry) => {
+        const entryUrl = urlUtils.parse(entry.url);
+        return parsedItemUrl.pathname?.includes(entryUrl.pathname as string)
+            ? [...itemsToUpdate, entry]
+            : itemsToUpdate;
+    }, []);
+    const { del, ins } = getNewIndexTriples(
         [...(itemsToUpdate ?? []), ...itemsToAdd],
         this.graph,
         indexUrl,
@@ -186,7 +191,7 @@ export const addToIndex = async function(
 };
 
 const getNewIndexTriples = (
-    items: (FolderIndexEntry | FileIndexEntry)[],
+    items: IndexEntry[],
     graph: any,
     indexUrl: string,
 ) => {
@@ -196,9 +201,7 @@ const getNewIndexTriples = (
     items
         .filter((item) => item.url !== indexUrl)
         .forEach((item) => {
-            const folderItem = item as FolderIndexEntry;
-            const fileItem = item as FileIndexEntry;
-            if (folderItem && folderItem.types) {
+            if (item && item.types.includes(ns.ldp('Container').value)) {
                 let rootNode = graph.any(
                     null,
                     ns.solid('instanceContainer'),
@@ -206,7 +209,7 @@ const getNewIndexTriples = (
                 );
 
                 if (!rootNode) {
-                    rootNode = new rdf.BlankNode(cuid());
+                    rootNode = new rdf.NamedNode(`${indexUrl}#${cuid()}`);
                     ins.push(
                         rdf.st(
                             rootNode,
@@ -223,21 +226,21 @@ const getNewIndexTriples = (
                             rdf.sym(indexUrl),
                         ),
                     );
-                    if (folderItem.types.length === 0) {
+                    if (item.types.length === 0) {
                         graph
                             .statementsMatching(rootNode, ns.solid('forClass'))
                             .forEach((st) => del.push(st));
                     } else {
-                        folderItem.types.forEach((type) =>
+                        item.types.forEach((type) => {
                             ins.push(
                                 rdf.st(
                                     rootNode,
                                     ns.solid('forClass'),
-                                    types(type + '#Resource'),
+                                    rdf.sym(type),
                                     rdf.sym(indexUrl),
                                 ),
-                            ),
-                        );
+                            );
+                        });
                     }
                 } else {
                     const typesFound = graph
@@ -245,14 +248,14 @@ const getNewIndexTriples = (
                         .map((node: { value: string }) => node.value);
                     const typesToDelete = typesFound.reduce(
                         (notFoundTypes: string[], type: string) =>
-                            !folderItem.types.includes(type)
+                            !item.types.includes(type)
                                 ? Array.isArray(notFoundTypes)
                                     ? [...notFoundTypes, type]
                                     : [type]
                                 : notFoundTypes,
                         [],
                     );
-                    const typesToAdd = folderItem.types.reduce(
+                    const typesToAdd = item.types.reduce(
                         (notFoundTypes: string[], type: string) =>
                             !typesFound.includes(type)
                                 ? [...notFoundTypes, type]
@@ -273,21 +276,21 @@ const getNewIndexTriples = (
                             rdf.st(
                                 rootNode,
                                 ns.solid('forClass'),
-                                types(type + '#Resource'),
+                                rdf.sym(type),
                                 rdf.sym(indexUrl),
                             ),
                         ),
                     );
                 }
-            } else if (fileItem && fileItem.type) {
+            } else if (item && item.types.includes(ns.ldp('Resource').value)) {
                 let rootNode = graph.any(
                     null,
                     ns.solid('instance'),
-                    rdf.sym(fileItem.url),
+                    rdf.sym(item.url),
                 );
 
                 if (!rootNode) {
-                    rootNode = new rdf.BlankNode(cuid());
+                    rootNode = new rdf.NamedNode(`${indexUrl}#${cuid()}`);
                     ins.push(
                         rdf.st(
                             rootNode,
@@ -300,38 +303,51 @@ const getNewIndexTriples = (
                         rdf.st(
                             rootNode,
                             ns.solid('instance'),
-                            rdf.sym(fileItem.url),
+                            rdf.sym(item.url),
                             rdf.sym(indexUrl),
                         ),
                     );
-                    ins.push(
-                        rdf.st(
-                            rootNode,
-                            ns.solid('forClass'),
-                            types(fileItem.type + '#Resource'),
-                            rdf.sym(indexUrl),
-                        ),
-                    );
-                } else {
-                    const currentType = graph
-                        .any(rootNode, ns.solid('forClass'), null)
-                        .value.replace(typeNamespaceUrl, '')
-                        .replace('#Resource', '');
-                    if (currentType !== fileItem.type) {
-                        graph
-                            .statementsMatching(rootNode, ns.solid('forClass'))
-                            .forEach((st: rdf.Statement) => del.push(st));
+                    item.types.forEach((type) => {
                         ins.push(
                             rdf.st(
                                 rootNode,
                                 ns.solid('forClass'),
-                                types(fileItem.type + '#Resource'),
+                                rdf.sym(type),
                                 rdf.sym(indexUrl),
                             ),
                         );
-                    }
+                    });
+                } else {
+                    const currentTypes = graph
+                        .each(rootNode, ns.solid('forClass'), null)
+                        .map((node) => node.value);
+                    currentTypes.map((type) => {
+                        if (!item.types.includes(type)) {
+                            graph
+                                .statementsMatching(
+                                    rootNode,
+                                    ns.solid('forClass'),
+                                    rdf.sym(type),
+                                )
+                                .forEach((st) => {
+                                    del.push(st);
+                                });
+                        }
+                    });
+                    item.types.forEach((type) => {
+                        if (!currentTypes.includes(type)) {
+                            ins.push(
+                                rdf.st(
+                                    rootNode,
+                                    ns.solid('forClass'),
+                                    rdf.sym(type),
+                                    rdf.sym(indexUrl),
+                                ),
+                            );
+                        }
+                    });
                 }
             }
         });
-    return [del, ins];
+    return { del, ins };
 };

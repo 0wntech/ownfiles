@@ -1,12 +1,13 @@
+import ns from 'solid-namespace';
+import mime from 'mime';
+import * as rdf from 'rdflib';
+
 import FileClient from './fileClient';
 import { FileType, FolderType } from './read';
 
-export interface FileIndexEntry {
-    url: string;
-    type: string;
-}
-
-export interface FolderIndexEntry {
+const typeNamespaceUrl = 'http://www.w3.org/ns/iana/media-types/';
+const types = rdf.Namespace(typeNamespaceUrl);
+export interface IndexEntry {
     url: string;
     types: string[];
 }
@@ -36,7 +37,7 @@ export const deepRead = async function(
                             if (options.verbose) {
                                 resolve({
                                     url: file.name,
-                                    type: file.type,
+                                    type: types(file.type + '#Resource').value,
                                 });
                             } else {
                                 resolve(file.name);
@@ -51,18 +52,34 @@ export const deepRead = async function(
                 ...fileList,
                 new Promise(function(resolve) {
                     if (options.verbose) {
-                        resolve({ url: folderUrl, type: 'folder' });
+                        resolve([
+                            {
+                                url: folderUrl.endsWith('/')
+                                    ? folderUrl
+                                    : folderUrl + '/',
+                                type: 'folder',
+                            },
+                        ]);
                     } else {
-                        resolve(folderUrl);
+                        resolve([
+                            folderUrl.endsWith('/')
+                                ? folderUrl
+                                : folderUrl + '/',
+                        ]);
                     }
                 }),
             ]);
         })
-        .catch(() =>
-            options.verbose
-                ? [{ url: folderUrl, type: 'folder' }]
-                : [folderUrl],
-        )
+        .catch(() => {
+            return options.verbose
+                ? [
+                      {
+                          url: folderUrl,
+                          type: mime.getType(folderUrl),
+                      },
+                  ]
+                : [folderUrl];
+        })
         .then((results): ({ url: string; type: string } | string)[] => {
             return flattenArray(results)
                 .sort((fileA: string, fileB: string) =>
@@ -79,27 +96,37 @@ export const deepRead = async function(
             return resource.type && resource.type === 'folder'
                 ? {
                       url: resource.url,
-                      types: getContainedTypes(resource, deepRead),
+                      types: [
+                          ...getContainedTypes(resource, deepRead),
+                          ns().ldp('Container'),
+                      ],
                   }
-                : resource;
+                : {
+                      url: resource.url,
+                      types: [resource.type, ns().ldp('Resource')],
+                  };
         });
 
-        return verboseDeepRead;
+        return verboseDeepRead as IndexEntry[];
     }
 
-    return deepRead;
+    return deepRead as string[];
 };
 
 const getContainedTypes = (item, index) => {
     return index
         .reduce(
-            (allTypes: string[], currentItem: { url: string; type: string }) =>
-                currentItem.url.includes(item.url) &&
-                currentItem.type &&
-                currentItem.type !== null &&
-                currentItem.type !== 'folder'
+            (
+                allTypes: string[],
+                currentItem: { url: string; type: string },
+            ) => {
+                return currentItem.url.includes(item.url) &&
+                    currentItem.type &&
+                    currentItem.type !== null &&
+                    currentItem.type !== 'folder'
                     ? [...allTypes, currentItem.type]
-                    : allTypes,
+                    : allTypes;
+            },
             [],
         )
         .filter(

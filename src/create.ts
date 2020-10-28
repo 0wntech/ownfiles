@@ -1,8 +1,13 @@
 import url from 'url';
 import mime from 'mime';
+import { Namespace } from 'rdflib';
+import ns from 'solid-namespace';
 
 import FileClient from './fileClient';
 import { Quad_Subject } from 'rdflib/lib/tf-types';
+
+const typeNamespaceUrl = 'http://www.w3.org/ns/iana/media-types/';
+const types = Namespace(typeNamespaceUrl);
 
 export interface CreateOptions {
     name: string;
@@ -77,7 +82,7 @@ export const createFolder = async function(
         const parsedUrl = url.parse(folderAddress);
         const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
         await this.addToIndex(
-            { url: rootUrl + location, types: [] },
+            { url: rootUrl + location, types: [ns().ldp('Container')] },
             { force: true },
         );
     }
@@ -124,7 +129,10 @@ export const createFile = async function(
         const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
         await this.addToIndex({
             url: rootUrl + location ?? fileAddress,
-            type: options.contentType ?? 'text/plain',
+            types: [
+                types(options.contentType ?? 'text/plain' + '#Resource'),
+                ns().ldp('Resource'),
+            ],
         });
     }
     return await res;

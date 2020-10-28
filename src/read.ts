@@ -90,7 +90,7 @@ export const read = async function(
             isFolder
         ) {
             rdf.parse(text, store, resource);
-            return parseFolderResult(resource, store, verbose);
+            return getFolderResult(resource, store, verbose);
         } else {
             if (verbose) {
                 return { body: text, contentType: contentType };
@@ -110,7 +110,7 @@ export const read = async function(
     }
 };
 
-export const parseFolderResult = (
+export const getFolderResult = (
     resource: string,
     store: any,
     verbose = false,

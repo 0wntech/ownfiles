@@ -12,7 +12,7 @@ import { copy, copyFile, copyFolder } from './copy';
 import { update } from './update';
 import { renameFile, renameFolder } from './rename';
 import * as deleting from './delete';
-import { deepRead, FileIndexEntry, FolderIndexEntry } from './deepRead';
+import { deepRead, IndexEntry } from './deepRead';
 import {
     createIndex,
     readIndex,
@@ -86,7 +86,7 @@ export default class FileClient {
         this: FileClient,
         folderUrl: string,
         options?: Partial<{ auth: any; verbose: boolean }>,
-    ) => Promise<(FileIndexEntry | FolderIndexEntry | string)[]>;
+    ) => Promise<(IndexEntry | string)[]>;
     createIndex: (
         this: FileClient,
         user: string,
@@ -99,7 +99,7 @@ export default class FileClient {
     ) => Promise<IndexType | undefined>;
     addToIndex: (
         this: FileClient,
-        item: FileIndexEntry | FolderIndexEntry | string,
+        item: IndexEntry | string,
         options?: {
             force?: boolean;
             updateCallback?: (

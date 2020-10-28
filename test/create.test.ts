@@ -21,6 +21,7 @@ describe('Create', function() {
 
         it('should create an index entry for a created folder', async function() {
             const index = await podClient.readIndex(config.podUrl);
+            console.log(index);
             const indexEntry = index?.find(
                 (entry) => entry.url === config.testFolder,
             );

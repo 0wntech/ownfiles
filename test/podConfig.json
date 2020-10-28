@@ -44,12 +44,18 @@
     },
     "fileIndex": [
         {
-            "url": "https://lalatest.solidcommunity.net/profile",
-            "types": ["text/turtle"]
+            "url": "https://lalatest.solidcommunity.net/profile/card",
+            "types": [
+                "http://www.w3.org/ns/iana/media-types/text/turtle#Resource",
+                "http://www.w3.org/ns/ldp#Resource"
+            ]
         },
         {
-            "url": "https://lalatest.solidcommunity.net/profile/card",
-            "types": ["text/turtle"]
+            "url": "https://lalatest.solidcommunity.net/profile/",
+            "types": [
+                "http://www.w3.org/ns/iana/media-types/text/turtle#Resource",
+                "http://www.w3.org/ns/ldp#Container"
+            ]
         }
     ],
     "updateTestFile": "https://lalatest.solidcommunity.net/robots.txt",

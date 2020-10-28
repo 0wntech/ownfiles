@@ -12,7 +12,9 @@ export const cleanUp = (podClient: FileClient): Promise<void> => {
         podClient.fetcher = new rdf.Fetcher(podClient.graph, {
             fetch: auth.fetch,
         });
-        const pod = (await podClient.read(config.podUrl)) as FolderType;
+        const pod = (await podClient.read(config.podUrl, {
+            headOnly: true,
+        })) as FolderType;
         const cleanUps: Promise<unknown>[] = [];
         pod.folders.forEach((element: string) => {
             if (!config.folder.folders.includes(element)) {
