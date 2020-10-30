@@ -29,10 +29,30 @@ export const deepRead = async function(
         headOnly: true,
         headers: { Accept: 'text/turtle' },
     })
+        .catch((err) => {
+            if (
+                err?.response?.url &&
+                err.response.status !== 404 &&
+                mime.getType(folderUrl)
+            ) {
+                return Promise.resolve(
+                    options.verbose
+                        ? [
+                              {
+                                  name: err.response.url,
+                                  type: mime.getType(err.response.url),
+                              },
+                          ]
+                        : err.response.url,
+                );
+            }
+            if (err?.response?.url && err.response.status !== 404)
+                return Promise.resolve({ files: [], folders: [] });
+        })
         .then((folder) => {
             const file = folder as FileType;
             folder = folder as FolderType;
-            if (file.name && file.type) {
+            if (file?.name && file.type) {
                 return Promise.resolve(
                     options.verbose
                         ? [
@@ -43,31 +63,30 @@ export const deepRead = async function(
                           ]
                         : [file.name],
                 );
-            } else {
+            } else if (folder?.files && folder.folders) {
                 const folderList = folder.folders.map((folder: string) =>
-                    Promise.resolve(this.deepRead(folder, options)),
+                    this.deepRead(folder, options),
                 );
                 const fileList = folder.files.map(
-                    (file: FileType | string) =>
+                    (file) =>
                         new Promise(function(resolve) {
-                            if (typeof file !== 'string') {
-                                if (options.verbose) {
-                                    options.foundCallback &&
-                                        options.foundCallback(file.name);
-                                    resolve({
-                                        url: file.name,
-                                        type: types(file.type + '#Resource')
-                                            .value,
-                                    });
-                                } else {
-                                    options.foundCallback &&
-                                        options.foundCallback(file.name);
-                                    resolve(file.name);
-                                }
+                            if (options.verbose) {
+                                options.foundCallback &&
+                                    options.foundCallback(
+                                        (file as FileType).name,
+                                    );
+                                resolve({
+                                    url: (file as FileType).name,
+                                    type: types(
+                                        (file as FileType).type + '#Resource',
+                                    ).value,
+                                });
                             } else {
                                 options.foundCallback &&
-                                    options.foundCallback(file);
-                                resolve(file);
+                                    options.foundCallback(
+                                        (file as FileType).name,
+                                    );
+                                resolve((file as FileType).name);
                             }
                         }),
                 );
@@ -98,39 +117,16 @@ export const deepRead = async function(
                     }),
                 ]);
             }
+
+            return Promise.resolve([]);
         })
-        .catch((err) => {
-            if (err.response.status !== 404 && err.response.status !== 403) {
-                const isFolder = err.response.headers
-                    .get('Location')
-                    ?.includes(ns().ldp('Container'));
-                if (isFolder) {
-                    folderUrl = folderUrl.endsWith('/')
-                        ? folderUrl + '/'
-                        : folderUrl;
-                    return options.verbose
-                        ? [
-                              {
-                                  url: folderUrl,
-                                  type: 'folder',
-                              },
-                          ]
-                        : [folderUrl];
-                } else {
-                    return options.verbose
-                        ? [
-                              {
-                                  url: folderUrl,
-                                  type: mime.getType(folderUrl),
-                              },
-                          ]
-                        : [folderUrl];
-                }
-            } else {
-                return [];
-            }
-        })
-        .then((results): ({ url: string; type: string } | string)[] => {
+        .then((results): (
+            | FileType
+            | FolderType
+            | { url: string; type: string }
+            | { url: string; types: string[] }
+            | string
+        )[] => {
             return flattenArray(results)
                 .sort((fileA: string, fileB: string) =>
                     sortByDepth(fileA, fileB, !!options.verbose),
@@ -139,22 +135,25 @@ export const deepRead = async function(
         });
 
     if (options.verbose) {
-        const verboseDeepRead = (deepRead as {
-            url: string;
-            type: string;
-        }[]).map((resource, _, deepRead) => {
-            if (resource.type) {
-                return resource.type === 'folder'
+        const verboseDeepRead = deepRead.map((resource, _, deepRead) => {
+            const previousIndexResource = resource as {
+                url: string;
+                types: string[];
+            };
+            const unseenResource = resource as { url: string; type: string };
+            if (previousIndexResource.types) return resource;
+            if (unseenResource?.type) {
+                return unseenResource.type === 'folder'
                     ? {
-                          url: resource.url,
+                          url: unseenResource.url,
                           types: [
                               ns().ldp('Container'),
-                              ...getContainedTypes(resource, deepRead),
+                              ...getContainedTypes(unseenResource, deepRead),
                           ],
                       }
                     : {
-                          url: resource.url,
-                          types: [resource.type, ns().ldp('Resource')],
+                          url: unseenResource.url,
+                          types: [unseenResource.type, ns().ldp('Resource')],
                       };
             }
         });

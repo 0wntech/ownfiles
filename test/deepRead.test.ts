@@ -15,7 +15,7 @@ describe('DeepRead', function() {
     });
 
     describe('deepRead()', function() {
-        it.only('should deep fetch a hierarchy of files from a given url', async function() {
+        it('should deep fetch a hierarchy of files from a given url', async function() {
             await podClient.createFolder(config.podUrl, { name: 'test' });
             await podClient.createFolder(config.podUrl + 'test/', {
                 name: 'test',
@@ -34,13 +34,13 @@ describe('DeepRead', function() {
             ]);
         });
 
-        it.only("should return nothing for something that doesn't exist", async function() {
+        it("should return nothing for something that doesn't exist", async function() {
             const deepFolder = await podClient.deepRead(
                 'https://ludwig.aws.owntech.de/profile/lalatestIndex.ttl',
             );
             expect(deepFolder).to.deep.equal([]);
         });
-        it.only('should return nothing for something that there is no permission for', async function() {
+        it('should return nothing for something that there is no permission for', async function() {
             const deepFolder = await podClient.deepRead(
                 'https://ludwig.aws.owntech.de/settings/lalatestIndex.ttl',
             );
