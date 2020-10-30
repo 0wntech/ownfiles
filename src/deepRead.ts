@@ -107,18 +107,20 @@ export const deepRead = async function(
             url: string;
             type: string;
         }[]).map((resource, _, deepRead) => {
-            return resource.type && resource.type === 'folder'
-                ? {
-                      url: resource.url,
-                      types: [
-                          ...getContainedTypes(resource, deepRead),
-                          ns().ldp('Container'),
-                      ],
-                  }
-                : {
-                      url: resource.url,
-                      types: [resource.type, ns().ldp('Resource')],
-                  };
+            if (resource.type) {
+                return resource.type === 'folder'
+                    ? {
+                          url: resource.url,
+                          types: [
+                              ns().ldp('Container'),
+                              ...getContainedTypes(resource, deepRead),
+                          ],
+                      }
+                    : {
+                          url: resource.url,
+                          types: [resource.type, ns().ldp('Resource')],
+                      };
+            }
         });
 
         return verboseDeepRead as IndexEntry[];

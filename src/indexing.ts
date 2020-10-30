@@ -311,14 +311,15 @@ const getNewIndexTriples = (
                         ),
                     );
                     item.types.forEach((type) => {
-                        ins.push(
-                            rdf.st(
-                                rootNode,
-                                ns.solid('forClass'),
-                                rdf.sym(type),
-                                rdf.sym(indexUrl),
-                            ),
-                        );
+                        if (type)
+                            ins.push(
+                                rdf.st(
+                                    rootNode,
+                                    ns.solid('forClass'),
+                                    rdf.sym(type),
+                                    rdf.sym(indexUrl),
+                                ),
+                            );
                     });
                 } else {
                     const currentTypes = graph

@@ -128,7 +128,7 @@ export const createFile = async function(
         const parsedUrl = url.parse(fileAddress);
         const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
         await this.addToIndex({
-            url: rootUrl + location ?? fileAddress,
+            url: rootUrl + location,
             types: [
                 types(options.contentType ?? 'text/plain' + '#Resource'),
                 ns().ldp('Resource'),
