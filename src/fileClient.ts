@@ -7,7 +7,13 @@ import {
     CreateOptions,
     ExtendedResponseType,
 } from './create';
-import { FolderType, read, ReadOptions, SingleFileType } from './read';
+import {
+    FileType,
+    FolderType,
+    read,
+    ReadOptions,
+    SingleFileType,
+} from './read';
 import { copy, copyFile, copyFolder } from './copy';
 import { update } from './update';
 import { renameFile, renameFolder } from './rename';
@@ -52,7 +58,7 @@ export default class FileClient {
         this: FileClient,
         resource: string,
         options?: Partial<ReadOptions>,
-    ) => Promise<FolderType | Blob | SingleFileType | string>;
+    ) => Promise<FolderType | Blob | SingleFileType | FileType | string>;
     copy: (
         this: FileClient,
         resource: string,

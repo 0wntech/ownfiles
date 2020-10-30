@@ -30,69 +30,104 @@ export const deepRead = async function(
         headers: { Accept: 'text/turtle' },
     })
         .then((folder) => {
+            const file = folder as FileType;
             folder = folder as FolderType;
-            const folderList = folder.folders.map((folder: string) =>
-                Promise.resolve(this.deepRead(folder, options)),
-            );
-            const fileList = folder.files.map(
-                (file: FileType | string) =>
-                    new Promise(function(resolve) {
-                        if (typeof file !== 'string') {
-                            if (options.verbose) {
-                                options.foundCallback &&
-                                    options.foundCallback(file.name);
-                                resolve({
-                                    url: file.name,
-                                    type: types(file.type + '#Resource').value,
-                                });
+            if (file.name && file.type) {
+                return Promise.resolve(
+                    options.verbose
+                        ? [
+                              {
+                                  url: file.name,
+                                  type: types(file.type + '#Resource').value,
+                              },
+                          ]
+                        : [file.name],
+                );
+            } else {
+                const folderList = folder.folders.map((folder: string) =>
+                    Promise.resolve(this.deepRead(folder, options)),
+                );
+                const fileList = folder.files.map(
+                    (file: FileType | string) =>
+                        new Promise(function(resolve) {
+                            if (typeof file !== 'string') {
+                                if (options.verbose) {
+                                    options.foundCallback &&
+                                        options.foundCallback(file.name);
+                                    resolve({
+                                        url: file.name,
+                                        type: types(file.type + '#Resource')
+                                            .value,
+                                    });
+                                } else {
+                                    options.foundCallback &&
+                                        options.foundCallback(file.name);
+                                    resolve(file.name);
+                                }
                             } else {
                                 options.foundCallback &&
-                                    options.foundCallback(file.name);
-                                resolve(file.name);
+                                    options.foundCallback(file);
+                                resolve(file);
                             }
+                        }),
+                );
+                return Promise.all([
+                    ...folderList,
+                    ...fileList,
+                    new Promise(function(resolve) {
+                        if (options.verbose) {
+                            options.foundCallback &&
+                                options.foundCallback(folderUrl);
+                            resolve([
+                                {
+                                    url: folderUrl.endsWith('/')
+                                        ? folderUrl
+                                        : folderUrl + '/',
+                                    type: 'folder',
+                                },
+                            ]);
                         } else {
                             options.foundCallback &&
-                                options.foundCallback(file);
-                            resolve(file);
-                        }
-                    }),
-            );
-            return Promise.all([
-                ...folderList,
-                ...fileList,
-                new Promise(function(resolve) {
-                    if (options.verbose) {
-                        options.foundCallback &&
-                            options.foundCallback(folderUrl);
-                        resolve([
-                            {
-                                url: folderUrl.endsWith('/')
+                                options.foundCallback(folderUrl);
+                            resolve([
+                                folderUrl.endsWith('/')
                                     ? folderUrl
                                     : folderUrl + '/',
-                                type: 'folder',
-                            },
-                        ]);
-                    } else {
-                        options.foundCallback &&
-                            options.foundCallback(folderUrl);
-                        resolve([
-                            folderUrl.endsWith('/')
-                                ? folderUrl
-                                : folderUrl + '/',
-                        ]);
-                    }
-                }),
-            ]);
+                            ]);
+                        }
+                    }),
+                ]);
+            }
         })
-        .catch(() => {
-            return options.verbose
-                ? [
-                      {
-                          url: folderUrl,
-                          type: mime.getType(folderUrl),
-                      },
-                  ]
-                : [folderUrl];
+        .catch((err) => {
+            console.log(err);
+            if (err.response.status !== 404) {
+                const isFolder = err.response.headers
+                    .get('Location')
+                    ?.includes(ns().ldp('Container'));
+                if (isFolder) {
+                    folderUrl = folderUrl.endsWith('/')
+                        ? folderUrl + '/'
+                        : folderUrl;
+                    return options.verbose
+                        ? [
+                              {
+                                  url: folderUrl,
+                                  type: 'folder',
+                              },
+                          ]
+                        : [folderUrl];
+                } else {
+                    return options.verbose
+                        ? [
+                              {
+                                  url: folderUrl,
+                                  type: mime.getType(folderUrl),
+                              },
+                          ]
+                        : [folderUrl];
+                }
+            }
         })
         .then((results): ({ url: string; type: string } | string)[] => {
             return flattenArray(results)

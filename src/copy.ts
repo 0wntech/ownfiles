@@ -4,7 +4,7 @@ import FileClient from './fileClient';
 
 import * as rdf from 'rdflib';
 import ns from 'solid-namespace';
-import { SingleFileType, FolderType } from './read';
+import { SingleFileType } from './read';
 
 export const copy = function(
     this: FileClient,
@@ -43,26 +43,24 @@ export const copyFile = function copyFile(
     resource: string,
     location: string,
 ): Promise<Response> {
-    return this.read(resource, { "verbose": true }).then(
-        (file: string | FolderType | SingleFileType | Blob) => {
-            file = file as SingleFileType;
-            const fileName = resource.substr(resource.lastIndexOf('/') + 1);
-            const options: CreateOptions = {
-                "name": fileName,
-                "contentType": file.contentType,
-                "contents": file.body,
-            };
+    return this.read(resource, { verbose: true }).then((file) => {
+        file = file as SingleFileType;
+        const fileName = resource.substr(resource.lastIndexOf('/') + 1);
+        const options: CreateOptions = {
+            name: fileName,
+            contentType: file.contentType,
+            contents: file.body,
+        };
 
-            location = location.endsWith('/') ? location : location + '/';
-            const newLocation = url.resolve(location, fileName);
-            return this.create(newLocation, options).then((res) => {
-                console.log(
-                    `DEBUG -- Successfully copied ${resource} to ${location}`,
-                );
-                return res;
-            });
-        },
-    );
+        location = location.endsWith('/') ? location : location + '/';
+        const newLocation = url.resolve(location, fileName);
+        return this.create(newLocation, options).then((res) => {
+            console.log(
+                `DEBUG -- Successfully copied ${resource} to ${location}`,
+            );
+            return res;
+        });
+    });
 };
 
 export const copyFolder = function copyFolder(
