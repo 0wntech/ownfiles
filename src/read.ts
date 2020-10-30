@@ -26,6 +26,13 @@ export interface SingleFileType {
     contentType: string;
 }
 
+export function ReadException(
+    this: { response: Response },
+    response: Response,
+) {
+    this.response = response;
+}
+
 export const read = async function(
     this: FileClient,
     resource: string,
@@ -51,6 +58,9 @@ export const read = async function(
     const headResponse = await fetch(resource, {
         method: 'HEAD',
     });
+    if (headResponse.status !== 200) {
+        throw new ReadException(headResponse);
+    }
     const isFolder =
         headResponse &&
         headResponse.headers
@@ -74,8 +84,6 @@ export const read = async function(
 
     const response = await fetch(resource, {
         headers: headers,
-    }).catch((err) => {
-        throw err;
     });
 
     const contentType = response.headers.get('Content-Type');
