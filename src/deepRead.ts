@@ -100,8 +100,7 @@ export const deepRead = async function(
             }
         })
         .catch((err) => {
-            console.log(err);
-            if (err.response.status !== 404) {
+            if (err.response.status !== 404 && err.response.status !== 403) {
                 const isFolder = err.response.headers
                     .get('Location')
                     ?.includes(ns().ldp('Container'));
@@ -127,6 +126,8 @@ export const deepRead = async function(
                           ]
                         : [folderUrl];
                 }
+            } else {
+                return [];
             }
         })
         .then((results): ({ url: string; type: string } | string)[] => {
