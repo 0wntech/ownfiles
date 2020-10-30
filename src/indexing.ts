@@ -10,16 +10,19 @@ export type IndexType = IndexEntry[];
 export const createIndex = async function(
     this: FileClient,
     url: string,
-    items?: IndexType,
+    options?: Partial<{ items: IndexType; foundCallback: (item) => unknown }>,
 ) {
     const parsedUrl = urlUtils.parse(url);
     const rootUrl = `${parsedUrl.protocol}//${parsedUrl.host}/`;
     const indexUrl = rootUrl + this.indexPath;
     await this.createIfNotExist(indexUrl);
     this.indexURI = indexUrl;
-    items =
-        (items as IndexEntry[]) ??
-        ((await this.deepRead(url, { verbose: true })) as IndexEntry[]);
+    const items =
+        (options?.items as IndexEntry[]) ??
+        ((await this.deepRead(url, {
+            verbose: true,
+            foundCallback: options?.foundCallback,
+        })) as IndexEntry[]);
 
     const { ins } = getNewIndexTriples(items, this.graph, indexUrl);
 

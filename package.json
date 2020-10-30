@@ -1,6 +1,6 @@
 {
     "name": "ownfiles",
-    "version": "1.2.57",
+    "version": "1.2.58",
     "description": "A library to manage files in a Solid User's Pod",
     "main": "lib/index.js",
     "scripts": {
@@ -60,7 +60,7 @@
     "husky": {
         "hooks": {
             "pre-commit": "lint-staged && npm run test",
-            "pre-push": "lint-staged && npm run test && npm version patch && npm publish"
+            "pre-push": "lint-staged && npm version patch && npm publish"
         }
     },
     "dependencies": {

@@ -85,12 +85,19 @@ export default class FileClient {
     deepRead: (
         this: FileClient,
         folderUrl: string,
-        options?: Partial<{ auth: any; verbose: boolean }>,
+        options?: Partial<{
+            auth: any;
+            verbose: boolean;
+            foundCallback: (item: string) => unknown;
+        }>,
     ) => Promise<(IndexEntry | string)[]>;
     createIndex: (
         this: FileClient,
         user: string,
-        items?: IndexType,
+        options?: Partial<{
+            items: IndexType;
+            foundCallback: (item) => unknown;
+        }>,
     ) => Promise<IndexType | undefined>;
     deleteIndex: (this: FileClient, user: string) => Promise<unknown>;
     readIndex: (

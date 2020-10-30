@@ -15,7 +15,11 @@ export interface IndexEntry {
 export const deepRead = async function(
     this: FileClient,
     folderUrl: string,
-    options: Partial<{ auth: any; verbose: boolean }> = {
+    options: Partial<{
+        auth: any;
+        verbose: boolean;
+        foundCallback: (item: string) => unknown;
+    }> = {
         auth: null,
         verbose: false,
     },
@@ -35,14 +39,20 @@ export const deepRead = async function(
                     new Promise(function(resolve) {
                         if (typeof file !== 'string') {
                             if (options.verbose) {
+                                options.foundCallback &&
+                                    options.foundCallback(file.name);
                                 resolve({
                                     url: file.name,
                                     type: types(file.type + '#Resource').value,
                                 });
                             } else {
+                                options.foundCallback &&
+                                    options.foundCallback(file.name);
                                 resolve(file.name);
                             }
                         } else {
+                            options.foundCallback &&
+                                options.foundCallback(file);
                             resolve(file);
                         }
                     }),
@@ -52,6 +62,8 @@ export const deepRead = async function(
                 ...fileList,
                 new Promise(function(resolve) {
                     if (options.verbose) {
+                        options.foundCallback &&
+                            options.foundCallback(folderUrl);
                         resolve([
                             {
                                 url: folderUrl.endsWith('/')
@@ -61,6 +73,8 @@ export const deepRead = async function(
                             },
                         ]);
                     } else {
+                        options.foundCallback &&
+                            options.foundCallback(folderUrl);
                         resolve([
                             folderUrl.endsWith('/')
                                 ? folderUrl
