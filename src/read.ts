@@ -71,7 +71,7 @@ export const read = async function(
             verbose
                 ? {
                       name: resource,
-                      type: headResponse.headers.get('Content-Type'),
+                      type: mime.getType(resource),
                   }
                 : resource,
         );
