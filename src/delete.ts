@@ -27,17 +27,22 @@ export const deleteRecursively = async function(
     resource: string,
 ) {
     const fileHierarchy = (await this.deepRead(resource)) as string[];
-    if (fileHierarchy.length > 1) {
+    if (fileHierarchy.length === 1) {
         return (await this.fetcher.webOperation(
             'DELETE',
             fileHierarchy[0],
         )) as ExtendedResponseType;
     } else {
-        const responses = await Promise.all(
-            fileHierarchy.map((item) =>
-                this.fetcher.webOperation('DELETE', item),
-            ) as Promise<ExtendedResponseType>[],
-        );
-        return responses[responses.length - 1];
+        return new Promise(async (resolve) => {
+            for (const file in fileHierarchy) {
+                const res = (await this.fetcher.webOperation(
+                    'DELETE',
+                    fileHierarchy[file],
+                )) as ExtendedResponseType;
+                if (fileHierarchy[file] === resource) {
+                    resolve(res);
+                }
+            }
+        }) as Promise<ExtendedResponseType>;
     }
 };
