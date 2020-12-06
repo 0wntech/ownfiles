@@ -63,9 +63,13 @@ export const read = async function(
     }
     const isFolder =
         headResponse &&
-        headResponse.headers
+        (headResponse.headers
             .get('Link')
-            ?.includes('http://www.w3.org/ns/ldp#Container');
+            ?.includes('http://www.w3.org/ns/ldp#Container') ||
+            (headResponse.headers
+                .get('Link')
+                ?.includes('http://www.w3.org/ns/ldp#Resource') &&
+                resource.endsWith('/')));
     if (!isFolder && headOnly) {
         return Promise.resolve(
             verbose
